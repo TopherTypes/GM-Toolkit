@@ -2,6 +2,7 @@ import { nowIso } from "../utils/dates.js";
 import { createId } from "../utils/ids.js";
 import { normalizeTags } from "../utils/strings.js";
 
+// Avoid smart quotes or typographic punctuation; keep JS source ASCII/UTF-8.
 // In-memory campaign store with persistence hooks.
 export const createCampaignStore = ({ storageService, toasts, banners }) => {
   let currentCampaignId = null;
@@ -119,9 +120,9 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     storageService.saveIndex(index);
     const usage = storageService.estimateUsage();
     if (usage.percent >= 90) {
-      banners?.show(\"Storage is almost full. Export now and consider cleaning archived items.\", \"warning\");
+      banners?.show("Storage is almost full. Export now and consider cleaning archived items.", "warning");
     } else if (usage.percent >= 70) {
-      banners?.show(\"Storage is getting full. Export a backup soon.\", \"warning\");
+      banners?.show("Storage is getting full. Export a backup soon.", "warning");
     }
     setSaving(false);
   };

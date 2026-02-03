@@ -190,6 +190,7 @@ For NPC/Creature/Item cards:
   - avoid excessive commentary on trivial code
 - Keep functions short and single-purpose
 - Don’t introduce new patterns without updating this doc
+- No smart quotes or typographic punctuation in JS source; use plain ASCII quotes.
 
 ---
 

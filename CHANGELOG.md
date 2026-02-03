@@ -16,6 +16,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ### Fixed
 - Fix GitHub Pages asset paths (relative paths for project site).
+- Fix campaignStore SyntaxError (remove invalid token / encoding issue).
 
 ### Removed
 
