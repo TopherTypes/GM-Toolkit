@@ -1,0 +1,15 @@
+/* Placeholder print styles for future GM-Toolkit packs */
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .app-topbar,
+  .side-nav,
+  .toast-container,
+  .modal-backdrop,
+  .footer-debug {
+    display: none !important;
+  }
+}

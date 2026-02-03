@@ -8,6 +8,9 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ### Added
 - Initial project documentation (README, product brief, MVP scope, information architecture, data model, tech/style guide, Codex instructions).
+- App shell scaffold with routing, campaign management, NPC module CRUD, and import/export flows.
+- Storage, debug, search, and PDF smoke test services with minimal UI components.
+- Base styles, theme variables, and component styling for the MVP interface.
 
 ### Changed
 
