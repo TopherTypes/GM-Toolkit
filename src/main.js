@@ -20,10 +20,13 @@ import { renderNpcListPage } from "./modules/npcs/npcListPage.js";
 import { renderNpcDetailPage } from "./modules/npcs/npcDetailPage.js";
 import { renderPartyListPage } from "./modules/party/partyListPage.js";
 import { renderCreatureListPage } from "./modules/creatures/creatureListPage.js";
+import { renderCreatureDetailPage } from "./modules/creatures/creatureDetailPage.js";
 import { renderEncounterListPage } from "./modules/encounters/encounterListPage.js";
+import { renderEncounterDetailPage } from "./modules/encounters/encounterDetailPage.js";
 import { renderLocationListPage } from "./modules/locations/locationListPage.js";
 import { renderItemListPage } from "./modules/items/itemListPage.js";
 import { renderSessionListPage } from "./modules/sessions/sessionListPage.js";
+import { renderSessionDetailPage } from "./modules/sessions/sessionDetailPage.js";
 import { renderReviewListPage } from "./modules/reviews/reviewListPage.js";
 import { createElement, clearElement } from "./ui/dom.js";
 
@@ -311,6 +314,57 @@ const handleRoute = async (route) => {
     content.append(renderNpcDetailPage({ app, campaignId: route.campaignId, npcId: route.npcId, campaign }));
     return;
   }
+
+  if (route.type === "creature-detail") {
+    if (!campaign.creatures?.[route.creatureId]) {
+      banners.show("Not found: that creature no longer exists.", "warning");
+      router.navigate(routes.moduleList(route.campaignId, "creatures"));
+      return;
+    }
+    content.append(
+      renderCreatureDetailPage({
+        app,
+        campaignId: route.campaignId,
+        creatureId: route.creatureId,
+        campaign,
+      })
+    );
+    return;
+  }
+
+  if (route.type === "encounter-detail") {
+    if (!campaign.encounters?.[route.encounterId]) {
+      banners.show("Not found: that encounter no longer exists.", "warning");
+      router.navigate(routes.moduleList(route.campaignId, "encounters"));
+      return;
+    }
+    content.append(
+      renderEncounterDetailPage({
+        app,
+        campaignId: route.campaignId,
+        encounterId: route.encounterId,
+        campaign,
+      })
+    );
+    return;
+  }
+
+  if (route.type === "session-detail") {
+    if (!campaign.sessions?.[route.sessionId]) {
+      banners.show("Not found: that session no longer exists.", "warning");
+      router.navigate(routes.moduleList(route.campaignId, "sessions"));
+      return;
+    }
+    content.append(
+      renderSessionDetailPage({
+        app,
+        campaignId: route.campaignId,
+        sessionId: route.sessionId,
+        campaign,
+      })
+    );
+    return;
+  }
 };
 
 const renderModuleList = ({ route, campaign }) => {
@@ -320,15 +374,15 @@ const renderModuleList = ({ route, campaign }) => {
     case "npcs":
       return renderNpcListPage({ app, campaignId: route.campaignId, campaign });
     case "creatures":
-      return renderCreatureListPage();
+      return renderCreatureListPage({ app, campaignId: route.campaignId, campaign });
     case "encounters":
-      return renderEncounterListPage();
+      return renderEncounterListPage({ app, campaignId: route.campaignId, campaign });
     case "locations":
       return renderLocationListPage();
     case "items":
       return renderItemListPage();
     case "sessions":
-      return renderSessionListPage();
+      return renderSessionListPage({ app, campaignId: route.campaignId, campaign });
     case "reviews":
       return renderReviewListPage();
     default:

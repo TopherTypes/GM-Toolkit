@@ -101,6 +101,7 @@ Required fields:
 - `adventurePath`
 - `notes`
 - `tags[]`
+- `partySizeForXpSplit` (number; default 4)
 - `createdAt`, `updatedAt`
 
 Example:
@@ -163,6 +164,7 @@ Fields:
 - `notes`
 - `tags[]`
 - `locationId` (optional; NPC → Location)
+- `status` ("wip" | "complete")
 - `createdAt`, `updatedAt`
 
 Example:
@@ -205,16 +207,18 @@ Fields:
 - `type`
 - `cr` (number; allow fractions as string like "1/2" if needed)
 - `xpAward` (number; derived from CR lookup)
-- `statBlock` semi-structured:
-  - `summary` (short)
-  - `ac` (optional number)
-  - `hp` (optional number)
-  - `speed` (optional string)
-  - `attacks` (optional string)
-  - `specials` (optional string)
-  - `fullText` (required string)
-- `sourceUrl` (string)
+- `source` object:
+  - `label`
+  - `url`
+- `extracted` object:
+  - `ac`
+  - `hp`
+  - `initiative`
+- `statBlock` (full pasted text)
+- `notes`
+- `variantOfCreatureId` (optional)
 - `tags[]`
+- `status` ("wip" | "complete")
 - `createdAt`, `updatedAt`
 
 > Note: `statBlock` will likely expand post-MVP.
@@ -225,7 +229,7 @@ Fields:
 - `campaignId`
 - `title`
 - `participants[]` extensible list of:
-  - `{ type: "creature"|"npc", id: "<entityId>", qty: number }`
+  - `{ type: "creature"|"npc", refId: "<entityId>", quantity: number, role: string }`
 - `tactics`
 - `mapRef`
 - `treasureNotes`

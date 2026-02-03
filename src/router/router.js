@@ -39,6 +39,18 @@ export const createRouter = ({ onRoute }) => {
       return { type: "npc-detail", campaignId, npcId: segments[3], path: "npcs" };
     }
 
+    if (moduleName === "creatures" && segments.length === 4) {
+      return { type: "creature-detail", campaignId, creatureId: segments[3], path: "creatures" };
+    }
+
+    if (moduleName === "encounters" && segments.length === 4) {
+      return { type: "encounter-detail", campaignId, encounterId: segments[3], path: "encounters" };
+    }
+
+    if (moduleName === "sessions" && segments.length === 4) {
+      return { type: "session-detail", campaignId, sessionId: segments[3], path: "sessions" };
+    }
+
     return { type: "not-found", campaignId, path: moduleName };
   };
 

@@ -45,6 +45,7 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
       adventurePath,
       notes,
       tags: normalizeTags(tags),
+      partySizeForXpSplit: 4,
       createdAt: timestamp,
       updatedAt: timestamp,
     };
@@ -106,6 +107,54 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     await persist();
   };
 
+  const addCreature = async (creature) => {
+    if (!currentCampaign) return;
+    currentCampaign.creatures[creature.id] = creature;
+    await persist();
+  };
+
+  const updateCreature = async (creatureId, updates) => {
+    if (!currentCampaign?.creatures[creatureId]) return;
+    currentCampaign.creatures[creatureId] = {
+      ...currentCampaign.creatures[creatureId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
+  const addEncounter = async (encounter) => {
+    if (!currentCampaign) return;
+    currentCampaign.encounters[encounter.id] = encounter;
+    await persist();
+  };
+
+  const updateEncounter = async (encounterId, updates) => {
+    if (!currentCampaign?.encounters[encounterId]) return;
+    currentCampaign.encounters[encounterId] = {
+      ...currentCampaign.encounters[encounterId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
+  const addSession = async (session) => {
+    if (!currentCampaign) return;
+    currentCampaign.sessions[session.id] = session;
+    await persist();
+  };
+
+  const updateSession = async (sessionId, updates) => {
+    if (!currentCampaign?.sessions[sessionId]) return;
+    currentCampaign.sessions[sessionId] = {
+      ...currentCampaign.sessions[sessionId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
   const persist = async () => {
     if (!currentCampaignId || !currentCampaign) return;
     setSaving(true);
@@ -158,6 +207,12 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     updateCampaignMeta,
     addNpc,
     updateNpc,
+    addCreature,
+    updateCreature,
+    addEncounter,
+    updateEncounter,
+    addSession,
+    updateSession,
     deleteCampaign,
     persist,
     getCurrentCampaign: () => currentCampaign,

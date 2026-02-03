@@ -40,6 +40,11 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
     children: tagSuggestions.map((tag) => createElement("option", { attrs: { value: tag } })),
   });
 
+  const statusToggle = createElement("input", {
+    attrs: { type: "checkbox", "aria-label": "Mark NPC as complete" },
+  });
+  statusToggle.checked = (npc?.status || "complete") === "complete";
+
   const attributeInputs = ["str", "dex", "con", "int", "wis", "cha"].map((attr) =>
     createElement("input", {
       className: "input",
@@ -107,6 +112,7 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
     createElement("label", { text: "Role", children: [roleInput] }),
     createElement("label", { text: "Class", children: [classInput] }),
     createElement("label", { text: "Level", children: [levelInput] }),
+    createElement("label", { text: "Status", children: [statusToggle] }),
     createElement("div", {
       className: "form-row inline",
       children: attributeInputs.map((input, index) =>
@@ -137,6 +143,7 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
       role: roleInput.value.trim(),
       class: classInput.value.trim(),
       level: Number(levelInput.value || 1),
+      status: statusToggle.checked ? "complete" : "wip",
       attributes,
       keySkills: skills.map((skill) => ({
         name: (skill.name || "").trim(),
