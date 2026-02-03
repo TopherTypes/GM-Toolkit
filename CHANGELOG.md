@@ -15,6 +15,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ### Changed
 
 ### Fixed
+- Fix GitHub Pages asset paths (relative paths for project site).
 
 ### Removed
 
