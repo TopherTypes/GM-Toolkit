@@ -8,6 +8,7 @@ import { routes } from "../../router/routes.js";
 import { openPickerModal } from "../../ui/components/PickerModal.js";
 import { calculateEncounterXp, getParticipantXp } from "./encounterUtils.js";
 import { getXpForCr, normalizeCr } from "../../utils/xp.js";
+import { confirmLoseUnsavedChanges, openEntityPreviewModal } from "../../ui/components/EntityPreviewModal.js";
 
 // Encounter detail page for editing participants and notes.
 export const renderEncounterDetailPage = ({ app, campaignId, encounterId, campaign }) => {
@@ -44,6 +45,12 @@ export const renderEncounterDetailPage = ({ app, campaignId, encounterId, campai
   });
   notesInput.value = encounter.notes || "";
 
+  // Track dirty state to guard against unsafe navigation.
+  let hasUnsavedChanges = false;
+  const markDirty = () => {
+    hasUnsavedChanges = true;
+  };
+
   const tagsInput = createElement("input", {
     className: "input",
     attrs: {
@@ -58,6 +65,11 @@ export const renderEncounterDetailPage = ({ app, campaignId, encounterId, campai
     children: app.searchService.suggestTags({ scopes: ["encounters"] }).map((tag) =>
       createElement("option", { attrs: { value: tag } })
     ),
+  });
+
+  // Form inputs should mark the encounter as dirty for navigation warnings.
+  [titleInput, mapInput, tacticsInput, treasureInput, notesInput, tagsInput].forEach((input) => {
+    input.addEventListener("input", markDirty);
   });
 
   const participantsContainer = createElement("div", { className: "form-grid" });
@@ -130,23 +142,44 @@ export const renderEncounterDetailPage = ({ app, campaignId, encounterId, campai
         participants[index].quantity = Math.max(1, Number(quantityInput.value || 1));
         xpValue.textContent = `XP ${getParticipantXp({ participant: participants[index], campaign }).toLocaleString()}`;
         renderXpSummary();
+        markDirty();
       });
 
       roleInput.addEventListener("input", () => {
         participants[index].role = roleInput.value.trim();
+        markDirty();
       });
 
       removeButton.addEventListener("click", () => {
         participants.splice(index, 1);
         renderParticipants();
+        markDirty();
       });
 
       openButton.addEventListener("click", () => {
-        if (participant.type === "creature") {
-          window.location.hash = routes.creatureDetail(campaignId, participant.refId);
-          return;
-        }
-        window.location.hash = routes.npcDetail(campaignId, participant.refId);
+        const navigateToDetail = () => {
+          if (participant.type === "creature") {
+            window.location.hash = routes.creatureDetail(campaignId, participant.refId);
+            return;
+          }
+          window.location.hash = routes.npcDetail(campaignId, participant.refId);
+        };
+
+        const handleOpenFull = () => {
+          app.modal.close();
+          if (hasUnsavedChanges) {
+            confirmLoseUnsavedChanges({ app, onConfirm: navigateToDetail });
+            return;
+          }
+          navigateToDetail();
+        };
+
+        openEntityPreviewModal({
+          app,
+          type: participant.type,
+          entity,
+          onOpenFull: entity ? handleOpenFull : null,
+        });
       });
 
       const row = createElement("div", {
@@ -318,6 +351,7 @@ export const renderEncounterDetailPage = ({ app, campaignId, encounterId, campai
       participants.push({ type, refId, quantity: 1, role: "" });
     }
     renderParticipants();
+    markDirty();
   };
 
   const openCreaturePicker = () => {
@@ -407,6 +441,7 @@ export const renderEncounterDetailPage = ({ app, campaignId, encounterId, campai
       tags,
     });
     app.toasts.show("Encounter updated.");
+    hasUnsavedChanges = false;
   });
 
   const saveButton = createElement("button", {

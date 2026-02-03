@@ -5,6 +5,7 @@ import { normalizeTags } from "../../utils/strings.js";
 import { routes } from "../../router/routes.js";
 import { openPickerModal } from "../../ui/components/PickerModal.js";
 import { buildEncounterParticipantSummary, calculateEncounterXp } from "../encounters/encounterUtils.js";
+import { confirmLoseUnsavedChanges, openEntityPreviewModal } from "../../ui/components/EntityPreviewModal.js";
 
 // Session detail page with encounter references.
 export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }) => {
@@ -40,6 +41,12 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
   });
   gmNotesInput.value = session.gmNotes || "";
 
+  // Track dirty state to protect against losing unsaved session changes.
+  let hasUnsavedChanges = false;
+  const markDirty = () => {
+    hasUnsavedChanges = true;
+  };
+
   const tagsInput = createElement("input", {
     className: "input",
     attrs: {
@@ -54,6 +61,11 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
     children: app.searchService.suggestTags({ scopes: ["sessions"] }).map((tag) =>
       createElement("option", { attrs: { value: tag } })
     ),
+  });
+
+  // Mark any form edits as unsaved changes.
+  [titleInput, dateInput, overviewInput, agendaInput, gmNotesInput, tagsInput].forEach((input) => {
+    input.addEventListener("input", markDirty);
   });
 
   const encounterList = createElement("div", { className: "form-grid" });
@@ -94,14 +106,16 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
       });
       const openButton = createElement("button", {
         className: "button secondary small",
-        text: "Open encounter",
+        text: "Preview",
         attrs: { type: "button" },
       });
 
       upButton.disabled = index === 0;
       downButton.disabled = index === encounterIds.length - 1;
 
-      upButton.addEventListener("click", () => {
+      upButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const swapIndex = index - 1;
         if (swapIndex < 0) return;
         [encounterIds[index], encounterIds[swapIndex]] = [
@@ -109,9 +123,12 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
           encounterIds[index],
         ];
         renderEncounterList();
+        markDirty();
       });
 
-      downButton.addEventListener("click", () => {
+      downButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const swapIndex = index + 1;
         if (swapIndex >= encounterIds.length) return;
         [encounterIds[index], encounterIds[swapIndex]] = [
@@ -119,15 +136,39 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
           encounterIds[index],
         ];
         renderEncounterList();
+        markDirty();
       });
 
-      removeButton.addEventListener("click", () => {
+      removeButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         encounterIds.splice(index, 1);
         renderEncounterList();
+        markDirty();
       });
 
-      openButton.addEventListener("click", () => {
-        window.location.hash = routes.encounterDetail(campaignId, encounterId);
+      openButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const navigateToDetail = () => {
+          window.location.hash = routes.encounterDetail(campaignId, encounterId);
+        };
+        const handleOpenFull = () => {
+          app.modal.close();
+          if (hasUnsavedChanges) {
+            confirmLoseUnsavedChanges({ app, onConfirm: navigateToDetail });
+            return;
+          }
+          navigateToDetail();
+        };
+        openEntityPreviewModal({
+          app,
+          type: "encounter",
+          entity: encounter,
+          encounterSummary: summary,
+          encounterXpTotal: xpSummary,
+          onOpenFull: encounter ? handleOpenFull : null,
+        });
       });
 
       const row = createElement("div", {
@@ -160,6 +201,7 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
         app.modal.close();
         encounterIds.push(item.id);
         renderEncounterList();
+        markDirty();
       },
       searchPlaceholder: "Search encounters",
     });
@@ -200,6 +242,7 @@ export const renderSessionDetailPage = ({ app, campaignId, sessionId, campaign }
       tags,
     });
     app.toasts.show("Session updated.");
+    hasUnsavedChanges = false;
   });
 
   const saveButton = createElement("button", {

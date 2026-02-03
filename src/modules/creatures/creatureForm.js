@@ -126,6 +126,20 @@ export const createCreatureForm = ({
 
   form.append(
     createElement("label", { text: "Name", children: [nameInput] }),
+    // Keep completion state visible at the top of the form for quick context.
+    createElement("label", {
+      text: "Completion",
+      children: [
+        createElement("div", {
+          className: "form-row inline",
+          children: [
+            createElement("span", { className: "text-muted", text: "WIP" }),
+            statusToggle,
+            createElement("span", { className: "text-muted", text: "Complete" }),
+          ],
+        }),
+      ],
+    }),
     createElement("label", { text: "Type", children: [typeInput] }),
     createElement("label", { text: "CR", children: [crInput] }),
     createElement("label", { text: "XP Award (computed)", children: [xpInput, xpHint] }),
@@ -138,7 +152,6 @@ export const createCreatureForm = ({
       ],
     }),
     createElement("label", { text: "Variant of", children: [variantSelect] }),
-    createElement("label", { text: "Status", children: [statusToggle] }),
     createElement("div", {
       className: "form-row inline",
       children: [
