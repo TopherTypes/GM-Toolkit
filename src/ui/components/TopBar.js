@@ -7,6 +7,7 @@ export const createTopBar = ({
   onSearch,
   onExport,
   onImport,
+  onSettings,
 }) => {
   const campaignSelect = createElement("select", {
     className: "select",
@@ -40,6 +41,12 @@ export const createTopBar = ({
     attrs: { type: "button" },
   });
 
+  const settingsButton = createElement("button", {
+    className: "button secondary",
+    text: "Settings",
+    attrs: { type: "button" },
+  });
+
   const savingIndicator = createElement("span", {
     className: "badge",
     text: "Saved",
@@ -67,6 +74,10 @@ export const createTopBar = ({
     onImport?.();
   });
 
+  settingsButton.addEventListener("click", () => {
+    onSettings?.();
+  });
+
   const element = createElement("header", {
     className: "app-topbar",
     children: [
@@ -81,7 +92,7 @@ export const createTopBar = ({
       }),
       createElement("div", {
         className: "app-topbar__right",
-        children: [searchInput, exportButton, importButton],
+        children: [searchInput, exportButton, importButton, settingsButton],
       }),
     ],
   });

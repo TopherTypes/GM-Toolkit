@@ -1,6 +1,7 @@
 // PDF generation service using a bundled pdf-lib compatible module.
 export const createPdfService = ({ banners, debug }) => {
   let pdfLibCache = null;
+  let debugState = debug;
 
   const loadPdfLib = () => {
     if (pdfLibCache) {
@@ -46,10 +47,15 @@ export const createPdfService = ({ banners, debug }) => {
     link.click();
     URL.revokeObjectURL(url);
 
-    if (debug?.enabled) {
+    if (debugState?.enabled) {
       console.debug("[GM-Toolkit] PDF smoke test generated.");
     }
   };
 
-  return { generateSmokeTest };
+  return {
+    generateSmokeTest,
+    setDebug: (nextDebug) => {
+      debugState = nextDebug;
+    },
+  };
 };

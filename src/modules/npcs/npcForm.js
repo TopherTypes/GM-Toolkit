@@ -52,8 +52,10 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
     })
   );
 
-  const skillContainer = createElement("div", { className: "form-grid" });
-  const renderSkills = (skills = []) => {
+  const skillContainer = createElement("div", { className: "form-grid npc-key-skills" });
+  const skills = npc?.keySkills ? npc.keySkills.map((skill) => ({ ...skill })) : [];
+
+  const renderSkills = () => {
     skillContainer.innerHTML = "";
     skills.forEach((skill, index) => {
       const nameField = createElement("input", {
@@ -77,7 +79,7 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
       });
       removeButton.addEventListener("click", () => {
         skills.splice(index, 1);
-        renderSkills(skills);
+        renderSkills();
       });
       skillContainer.append(
         createElement("div", {
@@ -88,8 +90,7 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
     });
   };
 
-  const skills = npc?.keySkills ? [...npc.keySkills] : [];
-  renderSkills(skills);
+  renderSkills();
 
   const addSkillButton = createElement("button", {
     className: "button secondary",
@@ -98,7 +99,7 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
   });
   addSkillButton.addEventListener("click", () => {
     skills.push({ name: "", bonus: 0 });
-    renderSkills(skills);
+    renderSkills();
   });
 
   form.append(
@@ -137,7 +138,10 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
       class: classInput.value.trim(),
       level: Number(levelInput.value || 1),
       attributes,
-      keySkills: skills.map((skill) => ({ name: skill.name || "", bonus: Number(skill.bonus || 0) })),
+      keySkills: skills.map((skill) => ({
+        name: (skill.name || "").trim(),
+        bonus: Number(skill.bonus || 0),
+      })),
       notes: notesInput.value.trim(),
       tags: normalizeTags(tagValues),
     });

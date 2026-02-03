@@ -11,12 +11,17 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - App shell scaffold with routing, campaign management, NPC module CRUD, and import/export flows.
 - Storage, debug, search, and PDF smoke test services with minimal UI components.
 - Base styles, theme variables, and component styling for the MVP interface.
+- Settings modal with theme, archived defaults, debug toggle, and debug report copy.
+- Campaign deletion flow with confirmation from the dashboard.
 
 ### Changed
+- Modal layout now supports sticky header/footer with scrollable body for small viewports.
+- NPC list rows include hover and focus affordances with archived markers.
 
 ### Fixed
 - Fix GitHub Pages asset paths (relative paths for project site).
 - Fix campaignStore SyntaxError (remove invalid token / encoding issue).
+- Prevent NPC key skills from overflowing modals and ensure removals persist.
 
 ### Removed
 

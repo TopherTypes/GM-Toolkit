@@ -7,18 +7,30 @@ export const createListView = () => {
   const setItems = (items) => {
     container.innerHTML = "";
     items.forEach((item) => {
-      const row = createElement("div", { className: "list-item" });
-      const main = createElement("div", { children: [createElement("strong", { text: item.title })] });
+      const isClickable = Boolean(item.onClick);
+      const row = createElement(isClickable ? "button" : "div", {
+        className: `list-item${isClickable ? " list-item--clickable" : ""}${
+          item.isArchived ? " list-item--archived" : ""
+        }`,
+        attrs: isClickable
+          ? { type: "button", "aria-label": item.ariaLabel || `Open ${item.title}` }
+          : {},
+      });
+      const title = createElement("strong", { className: "list-item__title", text: item.title });
+      const badges = createElement("div", {
+        className: "list-item__badges",
+        children: (item.badges || []).map((badge) =>
+          createElement("span", {
+            className: `badge ${badge.variant || ""}`.trim(),
+            text: badge.text,
+          })
+        ),
+      });
+      const main = createElement("div", { className: "list-item__main", children: [title, badges] });
       const meta = createElement("div", { className: "list-item__meta", text: item.meta || "" });
       row.append(main, meta);
-      if (item.onClick) {
-        row.tabIndex = 0;
+      if (isClickable) {
         row.addEventListener("click", item.onClick);
-        row.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            item.onClick();
-          }
-        });
       }
       container.append(row);
     });

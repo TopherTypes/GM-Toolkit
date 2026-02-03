@@ -4,6 +4,8 @@ import { SCHEMA_VERSION } from "../version.js";
 
 // Storage service for campaigns, settings, and debug data.
 export const createStorageService = ({ banners, debug }) => {
+  let debugState = debug;
+
   const loadIndex = () => {
     const raw = localStorage.getItem(INDEX_KEY);
     if (!raw) {
@@ -77,7 +79,7 @@ export const createStorageService = ({ banners, debug }) => {
   };
 
   const logDebug = (...args) => {
-    if (debug?.enabled) {
+    if (debugState?.enabled) {
       console.debug("[GM-Toolkit]", ...args);
     }
   };
@@ -91,7 +93,13 @@ export const createStorageService = ({ banners, debug }) => {
     saveDebug,
     loadCampaign,
     saveCampaign,
+    deleteCampaign: (campaignId) => {
+      localStorage.removeItem(campaignKey(campaignId));
+    },
     estimateUsage,
     logDebug,
+    setDebug: (nextDebug) => {
+      debugState = nextDebug;
+    },
   };
 };

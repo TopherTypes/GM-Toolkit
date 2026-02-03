@@ -34,8 +34,16 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
   const showArchivedToggle = createElement("input", {
     attrs: { type: "checkbox", "aria-label": "Show archived" },
   });
+  const archivedStateBadge = createElement("span", { className: "badge", text: "Showing archived: OFF" });
 
   let searchQuery = "";
+  showArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
+
+  const updateArchivedState = () => {
+    const isOn = showArchivedToggle.checked;
+    archivedStateBadge.textContent = `Showing archived: ${isOn ? "ON" : "OFF"}`;
+    archivedStateBadge.className = isOn ? "badge warning" : "badge";
+  };
 
   const refresh = () => {
     const npcs = Object.values(campaign.npcs || {});
@@ -69,6 +77,8 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
       sorted.map((npc) => ({
         title: npc.name,
         meta: [npc.role, npc.class, `Level ${npc.level}`].filter(Boolean).join(" • "),
+        isArchived: npc.isArchived,
+        badges: npc.isArchived ? [{ text: "ARCHIVED", variant: "muted" }] : [],
         onClick: () => {
           window.location.hash = routes.npcDetail(campaignId, npc.id);
         },
@@ -84,7 +94,10 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
   });
   tagFilter.addEventListener("input", refresh);
   sortSelect.addEventListener("change", refresh);
-  showArchivedToggle.addEventListener("change", refresh);
+  showArchivedToggle.addEventListener("change", () => {
+    updateArchivedState();
+    refresh();
+  });
 
   const newNpcButton = createElement("button", {
     className: "button",
@@ -128,12 +141,19 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
       className: "form-row inline",
       children: [searchInput, tagFilter, sortSelect],
     }),
-    createElement("label", { text: "Show archived", children: [showArchivedToggle] }),
+    createElement("div", {
+      className: "form-row inline",
+      children: [
+        createElement("label", { text: "Show archived", children: [showArchivedToggle] }),
+        archivedStateBadge,
+      ],
+    }),
     newNpcButton
   );
 
   listCard.append(listView.element);
 
+  updateArchivedState();
   container.append(header, listCard);
   refresh();
 
