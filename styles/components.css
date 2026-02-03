@@ -140,6 +140,11 @@
   color: var(--color-warning);
 }
 
+.badge.muted {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--color-text-muted);
+}
+
 .list {
   display: grid;
   gap: 0.75rem;
@@ -153,11 +158,62 @@
   border-radius: 0.75rem;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
+  width: 100%;
+  text-align: left;
+  align-items: center;
+  appearance: none;
+}
+
+.list-item__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.list-item__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list-item__badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.list-item--clickable {
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.list-item--clickable:hover {
+  background: var(--color-surface-alt);
+  border-color: var(--color-primary);
+}
+
+.list-item--clickable:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.list-item--archived {
+  opacity: 0.7;
+}
+
+.list-item--archived .list-item__title {
+  text-decoration: line-through;
 }
 
 .list-item__meta {
   color: var(--color-text-muted);
   font-size: 0.85rem;
+}
+
+.npc-key-skills {
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 .banner {
@@ -206,24 +262,61 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
   z-index: 200;
 }
 
 .modal {
   max-width: 640px;
-  width: min(90vw, 640px);
+  width: min(96vw, 640px);
+  max-height: 90vh;
   background: var(--color-surface);
   border-radius: 0.75rem;
   border: 1px solid var(--color-border);
-  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal__header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal__body {
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .modal__actions {
+  position: sticky;
+  bottom: 0;
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-top: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.modal__close {
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
 }
 
 .footer-debug {

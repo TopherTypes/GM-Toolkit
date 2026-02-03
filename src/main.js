@@ -36,7 +36,8 @@ const modal = createModal();
 const debugFromQuery = new URLSearchParams(window.location.search).get("debug") === "1";
 const storageService = createStorageService({ banners, debug: { enabled: debugFromQuery } });
 const debugState = storageService.loadDebug();
-const debugEnabled = debugFromQuery || debugState.enabled;
+let debugEnabled = debugFromQuery || debugState.enabled;
+storageService.setDebug({ enabled: debugEnabled });
 
 const campaignStore = createCampaignStore({ storageService, toasts, banners });
 const searchService = createSearchService();
@@ -61,7 +62,24 @@ const importService = createImportService({
   },
 });
 
-const app = { banners, toasts, modal, campaignStore, searchService, pdfService };
+let settings = storageService.loadSettings();
+const app = {
+  banners,
+  toasts,
+  modal,
+  campaignStore,
+  searchService,
+  pdfService,
+  settings: {
+    get: () => settings,
+    update: (updates) => {
+      settings = { ...settings, ...updates };
+      storageService.saveSettings(settings);
+      setTheme(settings);
+      return settings;
+    },
+  },
+};
 
 const setTheme = (settings) => {
   const theme = settings.theme || "system";
@@ -73,7 +91,6 @@ const setTheme = (settings) => {
   document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
 };
 
-const settings = storageService.loadSettings();
 setTheme(settings);
 
 const topBar = createTopBar({
@@ -94,6 +111,7 @@ const topBar = createTopBar({
     exportService.exportCampaign({ campaignId, payload });
   },
   onImport: () => importService.openImportDialog(),
+  onSettings: () => openSettingsModal(),
 });
 
 const sideNav = createSideNav({
@@ -170,6 +188,62 @@ const openGlobalSearch = (query) => {
   modal.open({ title: "Global search", content: list, actions: [] });
 };
 
+const openSettingsModal = () => {
+  const themeSelect = createElement("select", { className: "select", attrs: { "aria-label": "Theme" } });
+  [
+    { value: "system", label: "System" },
+    { value: "light", label: "Light" },
+    { value: "dark", label: "Dark" },
+  ].forEach((option) => {
+    themeSelect.append(createElement("option", { text: option.label, attrs: { value: option.value } }));
+  });
+  themeSelect.value = app.settings.get().theme || "system";
+  themeSelect.addEventListener("change", () => {
+    app.settings.update({ theme: themeSelect.value });
+  });
+
+  const archivedToggle = createElement("input", {
+    attrs: { type: "checkbox", "aria-label": "Show archived by default" },
+  });
+  archivedToggle.checked = Boolean(app.settings.get().showArchivedByDefault);
+  archivedToggle.addEventListener("change", () => {
+    app.settings.update({ showArchivedByDefault: archivedToggle.checked });
+  });
+
+  const debugToggle = createElement("input", {
+    attrs: { type: "checkbox", "aria-label": "Enable debug mode" },
+  });
+  debugToggle.checked = debugEnabled;
+  debugToggle.addEventListener("change", () => {
+    setDebugEnabled(debugToggle.checked);
+  });
+
+  const copyDebugButton = createElement("button", {
+    className: "button secondary",
+    text: "Copy debug report",
+    attrs: { type: "button" },
+  });
+  copyDebugButton.addEventListener("click", () => {
+    copyDebugReport();
+  });
+
+  const content = createElement("div", {
+    className: "form-grid",
+    children: [
+      createElement("label", { text: "Theme", children: [themeSelect] }),
+      createElement("label", { text: "Show archived by default", children: [archivedToggle] }),
+      createElement("label", { text: "Debug mode", children: [debugToggle] }),
+      createElement("div", { className: "form-row inline", children: [copyDebugButton] }),
+    ],
+  });
+
+  modal.open({
+    title: "Settings",
+    content,
+    actions: [{ label: "Close", variant: "secondary", onClick: () => modal.close() }],
+  });
+};
+
 const handleRoute = async (route) => {
   clearElement(content);
   banners.clear();
@@ -216,7 +290,7 @@ const handleRoute = async (route) => {
   sideNav.updateActive();
 
   if (route.type === "dashboard") {
-    content.append(renderDashboardPage({ app, campaign }));
+    content.append(renderDashboardPage({ app, campaign, campaignId: route.campaignId }));
     return;
   }
 
@@ -286,6 +360,42 @@ const renderCampaignNotFound = () => {
   return container;
 };
 
+const buildDebugReport = () => {
+  const usage = storageService.estimateUsage();
+  return {
+    version: APP_VERSION,
+    schemaVersion: SCHEMA_VERSION,
+    storagePercent: usage.percent,
+    campaignId: campaignStore.getCurrentCampaignId(),
+    route: window.location.hash || "#/",
+    userAgent: navigator.userAgent,
+    timestamp: new Date().toISOString(),
+  };
+};
+
+const copyDebugReport = async () => {
+  const text = JSON.stringify(buildDebugReport(), null, 2);
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+  toasts.show("Debug report copied.");
+};
+
+const setDebugEnabled = (enabled) => {
+  debugEnabled = debugFromQuery ? true : enabled;
+  storageService.saveDebug({ enabled: debugEnabled });
+  storageService.setDebug({ enabled: debugEnabled });
+  pdfService.setDebug({ enabled: debugEnabled });
+  renderDebugFooter();
+};
+
 const renderDebugFooter = () => {
   if (!debugEnabled) {
     debugFooter.style.display = "none";
@@ -293,14 +403,14 @@ const renderDebugFooter = () => {
   }
 
   debugFooter.style.display = "flex";
-  const usage = storageService.estimateUsage();
   debugFooter.innerHTML = "";
+  const report = buildDebugReport();
 
   const info = createElement("div", {
     children: [
       createElement("span", { text: `Version: ${APP_VERSION}` }),
       createElement("span", { text: `Schema: v${SCHEMA_VERSION}` }),
-      createElement("span", { text: `Storage: ${usage.percent}%` }),
+      createElement("span", { text: `Storage: ${report.storagePercent}%` }),
       createElement("span", { text: `Campaign: ${campaignStore.getCurrentCampaignId() || "None"}` }),
     ],
   });
@@ -309,26 +419,8 @@ const renderDebugFooter = () => {
     className: "button secondary",
     text: "Copy debug report",
   });
-  copyButton.addEventListener("click", async () => {
-    const report = {
-      version: APP_VERSION,
-      schemaVersion: SCHEMA_VERSION,
-      storagePercent: usage.percent,
-      campaignId: campaignStore.getCurrentCampaignId(),
-      timestamp: new Date().toISOString(),
-    };
-    const text = JSON.stringify(report, null, 2);
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      document.body.append(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      textarea.remove();
-    }
-    toasts.show("Debug report copied.");
+  copyButton.addEventListener("click", () => {
+    copyDebugReport();
   });
 
   debugFooter.append(info, copyButton);

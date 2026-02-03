@@ -127,6 +127,30 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     setSaving(false);
   };
 
+  // Prefer the most recently updated campaign when selecting a fallback route.
+  const selectMostRecentCampaignId = (campaigns) => {
+    if (!campaigns.length) {
+      return null;
+    }
+    const sorted = [...campaigns].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+    return sorted[0]?.campaignId || null;
+  };
+
+  const deleteCampaign = async (campaignId) => {
+    const index = storageService.loadIndex();
+    const remaining = index.campaigns.filter((campaign) => campaign.campaignId !== campaignId);
+    index.campaigns = remaining;
+    index.lastOpenedCampaignId = selectMostRecentCampaignId(remaining);
+    storageService.saveIndex(index);
+    storageService.deleteCampaign(campaignId);
+    if (currentCampaignId === campaignId) {
+      currentCampaignId = null;
+      currentCampaign = null;
+    }
+    notify();
+    return index.lastOpenedCampaignId;
+  };
+
   return {
     subscribe,
     createCampaign,
@@ -134,6 +158,7 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     updateCampaignMeta,
     addNpc,
     updateNpc,
+    deleteCampaign,
     persist,
     getCurrentCampaign: () => currentCampaign,
     getCurrentCampaignId: () => currentCampaignId,
