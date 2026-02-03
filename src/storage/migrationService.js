@@ -30,8 +30,39 @@ export const createMigrationService = ({ modal }) => {
     });
 
   const migratePayload = (payload) => {
-    // Stub migration: return payload as-is for schema v1.
-    return payload;
+    if (!payload) {
+      return payload;
+    }
+
+    // Schema v2 migration: add campaign XP split setting + status defaults.
+    const campaign = {
+      ...payload.campaign,
+      partySizeForXpSplit: Math.max(1, Number(payload.campaign?.partySizeForXpSplit || 4)),
+    };
+
+    const migrateCollectionStatus = (collection) => {
+      const next = {};
+      Object.values(collection || {}).forEach((entity) => {
+        next[entity.id] = {
+          ...entity,
+          status: entity.status || "complete",
+        };
+      });
+      return next;
+    };
+
+    return {
+      ...payload,
+      campaign,
+      party: payload.party || {},
+      npcs: migrateCollectionStatus(payload.npcs),
+      creatures: migrateCollectionStatus(payload.creatures),
+      encounters: payload.encounters || {},
+      locations: payload.locations || {},
+      items: payload.items || {},
+      sessions: payload.sessions || {},
+      sessionReviews: payload.sessionReviews || {},
+    };
   };
 
   return { needsMigration, confirmMigration, migratePayload };

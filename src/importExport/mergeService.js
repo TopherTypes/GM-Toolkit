@@ -50,11 +50,11 @@ export const createMergeService = () => {
   };
 
   const remapIdsForCopy = (payload) => {
-    // TODO: Remap relationship references (e.g., encounters participants) when modules expand.
-    const remapCollection = (collection, prefix, campaignId) => {
+    const remapCollection = (collection, prefix, campaignId, remapMap) => {
       const remapped = {};
       Object.values(collection || {}).forEach((entity) => {
         const newId = createId(prefix);
+        remapMap.set(entity.id, newId);
         remapped[newId] = { ...entity, id: newId, campaignId };
       });
       return remapped;
@@ -64,21 +64,47 @@ export const createMergeService = () => {
     const campaign = {
       ...payload.campaign,
       id: newCampaignId,
-      name: `${payload.campaign?.name || "Campaign"} (Imported)`
+      name: `${payload.campaign?.name || "Campaign"} (Imported)`,
     };
+
+    const npcMap = new Map();
+    const creatureMap = new Map();
+    const encounterMap = new Map();
+    const sessionMap = new Map();
+
+    const npcs = remapCollection(payload.npcs, "npc", newCampaignId, npcMap);
+    const creatures = remapCollection(payload.creatures, "crt", newCampaignId, creatureMap);
+    const encounters = remapCollection(payload.encounters, "enc", newCampaignId, encounterMap);
+    const sessions = remapCollection(payload.sessions, "ses", newCampaignId, sessionMap);
+
+    Object.values(encounters).forEach((encounter) => {
+      encounter.participants = (encounter.participants || []).map((participant) => {
+        if (participant.type === "creature" && creatureMap.has(participant.refId)) {
+          return { ...participant, refId: creatureMap.get(participant.refId) };
+        }
+        if (participant.type === "npc" && npcMap.has(participant.refId)) {
+          return { ...participant, refId: npcMap.get(participant.refId) };
+        }
+        return participant;
+      });
+    });
+
+    Object.values(sessions).forEach((session) => {
+      session.encounterIds = (session.encounterIds || []).map((id) => encounterMap.get(id) || id);
+    });
 
     return {
       payload: {
         ...payload,
         campaign,
-        party: remapCollection(payload.party, "pty", newCampaignId),
-        npcs: remapCollection(payload.npcs, "npc", newCampaignId),
-        creatures: remapCollection(payload.creatures, "crt", newCampaignId),
-        encounters: remapCollection(payload.encounters, "enc", newCampaignId),
-        locations: remapCollection(payload.locations, "loc", newCampaignId),
-        items: remapCollection(payload.items, "itm", newCampaignId),
-        sessions: remapCollection(payload.sessions, "ses", newCampaignId),
-        sessionReviews: remapCollection(payload.sessionReviews, "rev", newCampaignId),
+        party: remapCollection(payload.party, "pty", newCampaignId, new Map()),
+        npcs,
+        creatures,
+        encounters,
+        locations: remapCollection(payload.locations, "loc", newCampaignId, new Map()),
+        items: remapCollection(payload.items, "itm", newCampaignId, new Map()),
+        sessions,
+        sessionReviews: remapCollection(payload.sessionReviews, "rev", newCampaignId, new Map()),
       },
       newCampaignId,
     };

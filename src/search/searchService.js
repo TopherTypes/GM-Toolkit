@@ -2,10 +2,10 @@ import { matchesText, normalizeTag } from "../utils/strings.js";
 
 // Simple search service for module-level and global search.
 export const createSearchService = () => {
-  let index = { npcs: [] };
+  let index = { npcs: [], creatures: [], encounters: [], sessions: [] };
 
   const setIndex = (newIndex) => {
-    index = newIndex || { npcs: [] };
+    index = newIndex || { npcs: [], creatures: [], encounters: [], sessions: [] };
   };
 
   const searchNpcs = (query) => {
@@ -17,12 +17,18 @@ export const createSearchService = () => {
     });
   };
 
-  const suggestTags = () => {
-    const tags = new Set();
-    index.npcs.forEach((npc) => {
-      (npc.tags || []).forEach((tag) => tags.add(normalizeTag(tag)));
+  // Suggest tags across one or more module scopes.
+  const suggestTags = ({ scopes } = {}) => {
+    const tagSet = new Set();
+    const targets = scopes?.length
+      ? scopes
+      : ["npcs", "creatures", "encounters", "sessions"];
+    targets.forEach((scope) => {
+      (index[scope] || []).forEach((doc) => {
+        (doc.tags || []).forEach((tag) => tagSet.add(normalizeTag(tag)));
+      });
     });
-    return Array.from(tags).filter(Boolean);
+    return Array.from(tagSet).filter(Boolean);
   };
 
   return { setIndex, searchNpcs, suggestTags };

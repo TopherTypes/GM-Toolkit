@@ -97,9 +97,32 @@ export const renderDashboardPage = ({ app, campaign, campaignId }) => {
       createElement("p", { text: `NPCs: ${Object.keys(campaign?.npcs || {}).length}` }),
       createElement("p", { text: `Locations: ${Object.keys(campaign?.locations || {}).length}` }),
       createElement("p", { text: `Encounters: ${Object.keys(campaign?.encounters || {}).length}` }),
-      pdfButton,
     ],
   });
+
+  const partySizeInput = createElement("input", {
+    className: "input",
+    attrs: {
+      type: "number",
+      min: 1,
+      value: campaign?.campaign?.partySizeForXpSplit ?? 4,
+      "aria-label": "Party size for XP split",
+    },
+  });
+
+  const handlePartySizeUpdate = async () => {
+    const nextValue = Math.max(1, Number(partySizeInput.value || 4));
+    partySizeInput.value = String(nextValue);
+    await app.campaignStore.updateCampaignMeta({ partySizeForXpSplit: nextValue });
+    app.toasts.show("Party size updated.");
+  };
+
+  partySizeInput.addEventListener("change", handlePartySizeUpdate);
+
+  summaryCard.append(
+    createElement("label", { text: "Party size for XP split", children: [partySizeInput] }),
+    pdfButton
+  );
 
   const dangerCard = createElement("div", {
     className: "card",

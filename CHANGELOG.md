@@ -13,10 +13,14 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - Base styles, theme variables, and component styling for the MVP interface.
 - Settings modal with theme, archived defaults, debug toggle, and debug report copy.
 - Campaign deletion flow with confirmation from the dashboard.
+- Full Creatures and Encounters modules with CRUD, quick-create pickers, XP calculations, and backlinks.
+- Session prep module with ordered encounter references and inline summaries.
+- Campaign setting for party size XP split with schema migration support.
 
 ### Changed
 - Modal layout now supports sticky header/footer with scrollable body for small viewports.
 - NPC list rows include hover and focus affordances with archived markers.
+- Search index now includes creatures, encounters, and sessions for tag suggestions.
 
 ### Fixed
 - Fix GitHub Pages asset paths (relative paths for project site).

@@ -78,7 +78,10 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
         title: npc.name,
         meta: [npc.role, npc.class, `Level ${npc.level}`].filter(Boolean).join(" • "),
         isArchived: npc.isArchived,
-        badges: npc.isArchived ? [{ text: "ARCHIVED", variant: "muted" }] : [],
+        badges: [
+          ...(npc.status === "wip" ? [{ text: "WIP", variant: "warning" }] : []),
+          ...(npc.isArchived ? [{ text: "ARCHIVED", variant: "muted" }] : []),
+        ],
         onClick: () => {
           window.location.hash = routes.npcDetail(campaignId, npc.id);
         },
@@ -117,6 +120,7 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
           id: createId("npc"),
           campaignId,
           ...data,
+          status: data.status || "complete",
           createdAt: timestamp,
           updatedAt: timestamp,
           isArchived: false,
