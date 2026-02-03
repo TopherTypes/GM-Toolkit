@@ -109,10 +109,23 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
 
   form.append(
     createElement("label", { text: "Name", children: [nameInput] }),
+    // Keep completion state visible at the top of the form for quick context.
+    createElement("label", {
+      text: "Completion",
+      children: [
+        createElement("div", {
+          className: "form-row inline",
+          children: [
+            createElement("span", { className: "text-muted", text: "WIP" }),
+            statusToggle,
+            createElement("span", { className: "text-muted", text: "Complete" }),
+          ],
+        }),
+      ],
+    }),
     createElement("label", { text: "Role", children: [roleInput] }),
     createElement("label", { text: "Class", children: [classInput] }),
     createElement("label", { text: "Level", children: [levelInput] }),
-    createElement("label", { text: "Status", children: [statusToggle] }),
     createElement("div", {
       className: "form-row inline",
       children: attributeInputs.map((input, index) =>

@@ -26,6 +26,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - Fix GitHub Pages asset paths (relative paths for project site).
 - Fix campaignStore SyntaxError (remove invalid token / encoding issue).
 - Prevent NPC key skills from overflowing modals and ensure removals persist.
+- Clarify completion labels, keep WIP controls prominent, and add safe preview modals to prevent losing unsaved encounter/session changes.
 
 ### Removed
 
