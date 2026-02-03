@@ -6,15 +6,16 @@
     <meta name="gmtoolkit-version" content="0.2.0-dev" />
     <!-- Version: 0.2.0-dev -->
     <title>GM-Toolkit</title>
-    <link rel="stylesheet" href="/styles/base.css" />
-    <link rel="stylesheet" href="/styles/theme.css" />
-    <link rel="stylesheet" href="/styles/components.css" />
-    <link rel="stylesheet" href="/styles/print.css" media="print" />
+    <!-- Use relative asset paths so GitHub Pages project sites resolve under /<repo>/ and local file opens still work. -->
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/theme.css" />
+    <link rel="stylesheet" href="./styles/components.css" />
+    <link rel="stylesheet" href="./styles/print.css" media="print" />
   </head>
   <body>
     <div id="app" class="app-shell">
       <div class="app-loading">Loading GM-Toolkit…</div>
     </div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>
