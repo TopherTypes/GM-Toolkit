@@ -137,6 +137,68 @@
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 }
 
+/* Pill-shaped toggle switch used for completion status controls. */
+.completion-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.toggle-switch__input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.toggle-switch__slider {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.toggle-switch__slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  left: 3px;
+  top: 50%;
+  transform: translate(0, -50%);
+  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-switch__input:checked + .toggle-switch__slider {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.toggle-switch__input:checked + .toggle-switch__slider::before {
+  transform: translate(20px, -50%);
+}
+
+.toggle-switch__input:focus-visible + .toggle-switch__slider {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

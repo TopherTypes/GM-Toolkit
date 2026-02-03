@@ -40,10 +40,32 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
     children: tagSuggestions.map((tag) => createElement("option", { attrs: { value: tag } })),
   });
 
+  // Use a pill-style switch to represent completion status with a single, dynamic label.
   const statusToggle = createElement("input", {
-    attrs: { type: "checkbox", "aria-label": "Mark NPC as complete" },
+    className: "toggle-switch__input",
+    attrs: { type: "checkbox", "aria-label": "Toggle completion status" },
   });
   statusToggle.checked = (npc?.status || "complete") === "complete";
+  const statusLabel = createElement("span", {
+    className: "text-muted completion-status",
+    attrs: { "aria-live": "polite" },
+    text: "",
+  });
+  const statusSwitch = createElement("label", {
+    className: "toggle-switch",
+    children: [
+      statusToggle,
+      createElement("span", {
+        className: "toggle-switch__slider",
+        attrs: { "aria-hidden": "true" },
+      }),
+    ],
+  });
+  const updateStatusLabel = () => {
+    statusLabel.textContent = statusToggle.checked ? "Completed" : "WIP";
+  };
+  updateStatusLabel();
+  statusToggle.addEventListener("change", updateStatusLabel);
 
   const attributeInputs = ["str", "dex", "con", "int", "wis", "cha"].map((attr) =>
     createElement("input", {
@@ -114,12 +136,8 @@ export const createNpcForm = ({ npc, onSubmit, onCancel, tagSuggestions = [] }) 
       text: "Completion",
       children: [
         createElement("div", {
-          className: "form-row inline",
-          children: [
-            createElement("span", { className: "text-muted", text: "WIP" }),
-            statusToggle,
-            createElement("span", { className: "text-muted", text: "Complete" }),
-          ],
+          className: "completion-toggle",
+          children: [statusLabel, statusSwitch],
         }),
       ],
     }),
