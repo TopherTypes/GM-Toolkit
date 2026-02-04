@@ -42,6 +42,7 @@ Core outcomes:
 - Prep Session 1 → generate combined PDF pack → complete Session Review
 - LocalStorage persistence
 - JSON export/import with dry run, conflicts, and schema migration confirmation
+- Party roster management with archive controls and XP split integration
 
 Modules at MVP depth:
 - Campaign Dashboard

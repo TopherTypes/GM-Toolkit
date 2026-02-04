@@ -35,6 +35,10 @@ export const createRouter = ({ onRoute }) => {
       return { type: "module-list", campaignId, module: moduleName, path: moduleName };
     }
 
+    if (moduleName === "party" && segments.length === 4) {
+      return { type: "party-detail", campaignId, memberId: segments[3], path: "party" };
+    }
+
     if (moduleName === "npcs" && segments.length === 4) {
       return { type: "npc-detail", campaignId, npcId: segments[3], path: "npcs" };
     }
