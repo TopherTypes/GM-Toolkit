@@ -16,6 +16,16 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
     className: "input",
     attrs: { type: "search", placeholder: "Search NPCs and press Enter", "aria-label": "NPC search" },
   });
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
   const tagFilter = createElement("input", {
     className: "input",
     attrs: { type: "text", placeholder: "Filter by tag", "aria-label": "Filter by tag" },
@@ -35,6 +45,7 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "checkbox", "aria-label": "Show archived" },
   });
   const archivedStateBadge = createElement("span", { className: "badge", text: "Showing archived: OFF" });
+  const searchSummary = createElement("p", { className: "text-muted search-summary", text: "" });
 
   let searchQuery = "";
   showArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
@@ -43,6 +54,23 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
     const isOn = showArchivedToggle.checked;
     archivedStateBadge.textContent = `Showing archived: ${isOn ? "ON" : "OFF"}`;
     archivedStateBadge.className = isOn ? "badge warning" : "badge";
+  };
+
+  // Provide at-a-glance clarity on which filters are active.
+  const updateSearchSummary = (visibleCount, totalCount) => {
+    const parts = [];
+    if (searchQuery) {
+      parts.push(`search: “${searchQuery}”`);
+    }
+    if (tagFilter.value.trim()) {
+      parts.push(`tag: ${tagFilter.value.trim()}`);
+    }
+    if (showArchivedToggle.checked) {
+      parts.push("including archived");
+    }
+    const filterText = parts.length ? parts.join(" • ") : "no filters";
+    searchSummary.textContent = `Showing ${visibleCount} of ${totalCount} NPCs (${filterText}).`;
+    clearButton.disabled = !searchQuery && !tagFilter.value.trim();
   };
 
   const refresh = () => {
@@ -85,15 +113,35 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
         onClick: () => {
           window.location.hash = routes.npcDetail(campaignId, npc.id);
         },
-      }))
+      })),
+      {
+        emptyState: {
+          title: "No NPCs yet",
+          description: "Create your first NPC to start building session prep notes.",
+          actionLabel: "Create NPC",
+          onAction: () => openCreateNpcModal(),
+        },
+      }
     );
+    updateSearchSummary(filtered.length, npcs.length);
+  };
+
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    refresh();
   };
 
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchQuery = searchInput.value.trim();
-      refresh();
+      applySearch();
     }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    tagFilter.value = "";
+    searchQuery = "";
+    refresh();
   });
   tagFilter.addEventListener("input", refresh);
   sortSelect.addEventListener("change", refresh);
@@ -108,7 +156,7 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "button" },
   });
 
-  newNpcButton.addEventListener("click", () => {
+  const openCreateNpcModal = () => {
     const form = createNpcForm({
       onSubmit: async (data) => {
         if (!data.name) {
@@ -137,13 +185,17 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
       createElement("button", { className: "button", text: "Save", attrs: { type: "submit" } })
     );
     app.modal.open({ title: "Create NPC", content: form, actions: [] });
+  };
+
+  newNpcButton.addEventListener("click", () => {
+    openCreateNpcModal();
   });
 
   header.append(
     createElement("h1", { text: "NPCs" }),
     createElement("div", {
       className: "form-row inline",
-      children: [searchInput, tagFilter, sortSelect],
+      children: [searchInput, searchButton, clearButton, tagFilter, sortSelect],
     }),
     createElement("div", {
       className: "form-row inline",
@@ -152,6 +204,7 @@ export const renderNpcListPage = ({ app, campaignId, campaign }) => {
         archivedStateBadge,
       ],
     }),
+    searchSummary,
     newNpcButton
   );
 

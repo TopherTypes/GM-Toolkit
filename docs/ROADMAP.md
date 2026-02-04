@@ -62,6 +62,9 @@ Quality gates (MVP):
 - Basic performance acceptable at AP scale (dozens of NPCs/locations; 100+ encounters)
 - Manual regression checklist exists for PDF pack generation
 
+Status note:
+- MVP remains **in progress**; recent UX/search improvements reduce friction but do not complete the MVP acceptance criteria yet.
+
 ---
 
 ### NEXT (Post-MVP 0.3 → ~0.6)
@@ -111,7 +114,7 @@ Major milestone: **Google Drive sync**
 
 Other likely v1.0 enablers:
 - Plotline/quest tracking maturation (views, filtering, session linkage)
-- Search/tagging expansion beyond NPCs/Creatures
+- Global search preview UI + richer metadata polish
 - Stronger encounter templating and reusability
 - Print/PDF polish (layout consistency, overflow handling, card grids)
 

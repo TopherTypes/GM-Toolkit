@@ -98,6 +98,14 @@ const setTheme = (settings) => {
   document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
 };
 
+// Format timestamps for compact "Saved" badge text.
+const formatSavedLabel = (isoString) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
 setTheme(settings);
 
 const topBar = createTopBar({
@@ -170,29 +178,171 @@ const openCreateCampaignModal = () => {
   modal.open({ title: "Create campaign", content: form, actions: [] });
 };
 
-const openGlobalSearch = (query) => {
-  const results = searchService.searchNpcs(query || "");
-  const list = createElement("div", { className: "form-grid" });
-  if (!results.length) {
-    list.append(createElement("p", { text: "No results yet." }));
-  } else {
-    results.forEach((npc) => {
+const openGlobalSearch = (query = "") => {
+  const campaignId = campaignStore.getCurrentCampaignId();
+  const typeLabels = {
+    party: "Party",
+    npc: "NPC",
+    creature: "Creature",
+    encounter: "Encounter",
+    location: "Location",
+    item: "Item",
+    session: "Session",
+    review: "Review",
+  };
+
+  let searchQuery = query.trim();
+
+  const searchInput = createElement("input", {
+    className: "input",
+    attrs: {
+      type: "search",
+      placeholder: "Search all modules",
+      "aria-label": "Global search query",
+    },
+  });
+  searchInput.value = searchQuery;
+
+  const searchButton = createElement("button", {
+    className: "button",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
+
+  const includeArchivedToggle = createElement("input", {
+    attrs: { type: "checkbox", "aria-label": "Include archived results" },
+  });
+  includeArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
+
+  const summary = createElement("p", { className: "text-muted search-summary", text: "" });
+  const list = createElement("div", { className: "list" });
+  const hint = createElement("p", {
+    className: "text-muted",
+    text: "Search matches names/titles and tags across all modules.",
+  });
+
+  const buildRouteForResult = (result) => {
+    if (!campaignId) return null;
+    switch (result.type) {
+      case "party":
+        return routes.partyDetail(campaignId, result.id);
+      case "npc":
+        return routes.npcDetail(campaignId, result.id);
+      case "creature":
+        return routes.creatureDetail(campaignId, result.id);
+      case "encounter":
+        return routes.encounterDetail(campaignId, result.id);
+      case "location":
+        return routes.locationDetail(campaignId, result.id);
+      case "item":
+        return routes.itemDetail(campaignId, result.id);
+      case "session":
+        return routes.sessionDetail(campaignId, result.id);
+      case "review":
+        return routes.reviewDetail(campaignId, result.id);
+      default:
+        return null;
+    }
+  };
+
+  // Render search results with clear type and metadata to reduce navigation guesswork.
+  const renderResults = () => {
+    list.innerHTML = "";
+    const results = searchService.searchGlobal(searchQuery || "");
+    const visibleResults = includeArchivedToggle.checked
+      ? results
+      : results.filter((result) => !result.isArchived);
+
+    if (!searchQuery) {
+      summary.textContent = "Enter a search term to see results.";
+      list.append(createElement("p", { text: "No results yet." }));
+      clearButton.disabled = true;
+      return;
+    }
+
+    summary.textContent = `Showing ${visibleResults.length} result${visibleResults.length === 1 ? "" : "s"} for “${searchQuery}”.`;
+    clearButton.disabled = false;
+
+    if (!visibleResults.length) {
+      list.append(createElement("p", { text: "No matches found. Try another term or tag." }));
+      return;
+    }
+
+    visibleResults.forEach((result) => {
       const button = createElement("button", {
-        className: "button secondary",
-        text: npc.name,
-        attrs: { type: "button" },
+        className: "list-item list-item--clickable",
+        attrs: { type: "button", "aria-label": `Open ${result.title}` },
       });
+      const title = createElement("strong", { className: "list-item__title", text: result.title });
+      const badges = createElement("div", {
+        className: "list-item__badges",
+        children: [
+          createElement("span", { className: "badge muted", text: typeLabels[result.type] || "Item" }),
+          ...(result.isArchived ? [createElement("span", { className: "badge muted", text: "ARCHIVED" })] : []),
+        ],
+      });
+      const main = createElement("div", { className: "list-item__main", children: [title, badges] });
+      const meta = createElement("div", {
+        className: "list-item__meta",
+        text: result.meta || "",
+      });
+      button.append(main, meta);
       button.addEventListener("click", () => {
-        const campaignId = campaignStore.getCurrentCampaignId();
-        if (campaignId) {
-          window.location.hash = routes.npcDetail(campaignId, npc.id);
+        const route = buildRouteForResult(result);
+        if (route) {
+          window.location.hash = route;
           modal.close();
         }
       });
       list.append(button);
     });
-  }
-  modal.open({ title: "Global search", content: list, actions: [] });
+  };
+
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    renderResults();
+  };
+
+  searchInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      applySearch();
+    }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    searchQuery = "";
+    renderResults();
+  });
+  includeArchivedToggle.addEventListener("change", renderResults);
+
+  const content = createElement("div", {
+    className: "form-grid",
+    children: [
+      createElement("div", {
+        className: "form-row inline",
+        children: [searchInput, searchButton, clearButton],
+      }),
+      createElement("div", {
+        className: "form-row inline",
+        children: [
+          createElement("label", { text: "Include archived", children: [includeArchivedToggle] }),
+        ],
+      }),
+      summary,
+      hint,
+      list,
+    ],
+  });
+
+  renderResults();
+  modal.open({ title: "Global search", content, actions: [] });
 };
 
 const openSettingsModal = () => {
@@ -565,12 +715,22 @@ const mountAppShell = () => {
 campaignStore.subscribe(() => {
   const index = storageService.loadIndex();
   topBar.updateCampaigns(index.campaigns, campaignStore.getCurrentCampaignId());
-  topBar.updateSavingIndicator(campaignStore.isSaving() ? "Saving…" : "Saved");
+  topBar.updateSavingIndicator({
+    isSaving: campaignStore.isSaving(),
+    lastSavedLabel: formatSavedLabel(campaignStore.getLastSavedAt()),
+  });
   searchService.setIndex(buildIndex(campaignStore.getCurrentCampaign()));
   renderDebugFooter();
 });
 
 mountAppShell();
+// Register keyboard shortcuts once the shell is mounted to keep global search accessible.
+document.addEventListener("keydown", (event) => {
+  const isSearchShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k";
+  if (!isSearchShortcut) return;
+  event.preventDefault();
+  openGlobalSearch("");
+});
 const initialIndex = storageService.loadIndex();
 topBar.updateCampaigns(initialIndex.campaigns, initialIndex.lastOpenedCampaignId);
 router.init();

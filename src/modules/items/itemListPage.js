@@ -17,6 +17,16 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
     className: "input",
     attrs: { type: "search", placeholder: "Search items and press Enter", "aria-label": "Item search" },
   });
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
   const tagFilter = createElement("input", {
     className: "input",
     attrs: { type: "text", placeholder: "Filter by tag", "aria-label": "Filter by tag" },
@@ -36,6 +46,7 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "checkbox", "aria-label": "Show archived" },
   });
   const archivedStateBadge = createElement("span", { className: "badge", text: "Showing archived: OFF" });
+  const searchSummary = createElement("p", { className: "text-muted search-summary", text: "" });
 
   let searchQuery = "";
   showArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
@@ -44,6 +55,23 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
     const isOn = showArchivedToggle.checked;
     archivedStateBadge.textContent = `Showing archived: ${isOn ? "ON" : "OFF"}`;
     archivedStateBadge.className = isOn ? "badge warning" : "badge";
+  };
+
+  // Summarize active filters so the list remains predictable.
+  const updateSearchSummary = (visibleCount, totalCount) => {
+    const parts = [];
+    if (searchQuery) {
+      parts.push(`search: “${searchQuery}”`);
+    }
+    if (tagFilter.value.trim()) {
+      parts.push(`tag: ${tagFilter.value.trim()}`);
+    }
+    if (showArchivedToggle.checked) {
+      parts.push("including archived");
+    }
+    const filterText = parts.length ? parts.join(" • ") : "no filters";
+    searchSummary.textContent = `Showing ${visibleCount} of ${totalCount} items (${filterText}).`;
+    clearButton.disabled = !searchQuery && !tagFilter.value.trim();
   };
 
   const refresh = () => {
@@ -90,15 +118,35 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
             window.location.hash = routes.itemDetail(campaignId, item.id);
           },
         };
-      })
+      }),
+      {
+        emptyState: {
+          title: "No items yet",
+          description: "Add items to generate printable cards and handouts.",
+          actionLabel: "Create item",
+          onAction: () => openCreateItemModal(),
+        },
+      }
     );
+    updateSearchSummary(filtered.length, items.length);
+  };
+
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    refresh();
   };
 
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchQuery = searchInput.value.trim();
-      refresh();
+      applySearch();
     }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    tagFilter.value = "";
+    searchQuery = "";
+    refresh();
   });
   tagFilter.addEventListener("input", refresh);
   sortSelect.addEventListener("change", refresh);
@@ -113,7 +161,7 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "button" },
   });
 
-  newItemButton.addEventListener("click", () => {
+  const openCreateItemModal = () => {
     const existingPassphrases = Object.values(campaign.items || {}).map((entry) => entry.passphrase);
     const form = createItemForm({
       existingPassphrases,
@@ -155,13 +203,17 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
     });
     form.append(createElement("button", { className: "button", text: "Save", attrs: { type: "submit" } }));
     app.modal.open({ title: "Create item", content: form, actions: [] });
+  };
+
+  newItemButton.addEventListener("click", () => {
+    openCreateItemModal();
   });
 
   header.append(
     createElement("h1", { text: "Items" }),
     createElement("div", {
       className: "form-row inline",
-      children: [searchInput, tagFilter, sortSelect],
+      children: [searchInput, searchButton, clearButton, tagFilter, sortSelect],
     }),
     createElement("div", {
       className: "form-row inline",
@@ -170,6 +222,7 @@ export const renderItemListPage = ({ app, campaignId, campaign }) => {
         archivedStateBadge,
       ],
     }),
+    searchSummary,
     newItemButton
   );
 

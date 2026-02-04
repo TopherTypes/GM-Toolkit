@@ -48,8 +48,9 @@ Suggested metadata by type:
 - Item: passphrase (optional), item type (if implemented)
 
 ### Interaction
-- Result click opens a preview first (modal/drawer as appropriate), with “Open full page”.
+- Result click opens the full page in MVP (preview is a later enhancement).
 - Global search is available from the top bar and optional shortcut (`Ctrl+K` / `Cmd+K`).
+- Provide an “Include archived” toggle so users can find archived content when needed.
 
 ---
 
@@ -72,7 +73,7 @@ Examples:
 
 ### Result behavior
 - Search results update the current list view.
-- Provide an easy “Clear search” control to return to full list.
+- Provide an easy “Clear search” control to return to full list and reset tag filters.
 
 ---
 

@@ -4,8 +4,30 @@ import { createElement } from "../dom.js";
 export const createListView = () => {
   const container = createElement("div", { className: "list" });
 
-  const setItems = (items) => {
+  const setItems = (items, { emptyState } = {}) => {
     container.innerHTML = "";
+    if (!items.length) {
+      if (emptyState) {
+        const emptyCard = createElement("div", { className: "empty-state" });
+        emptyCard.append(createElement("h3", { text: emptyState.title || "Nothing here yet" }));
+        if (emptyState.description) {
+          emptyCard.append(createElement("p", { text: emptyState.description }));
+        }
+        if (emptyState.actionLabel && emptyState.onAction) {
+          const actionButton = createElement("button", {
+            className: "button secondary",
+            text: emptyState.actionLabel,
+            attrs: { type: "button" },
+          });
+          actionButton.addEventListener("click", () => emptyState.onAction());
+          emptyCard.append(
+            createElement("div", { className: "empty-state__actions", children: [actionButton] })
+          );
+        }
+        container.append(emptyCard);
+      }
+      return;
+    }
     items.forEach((item) => {
       const isClickable = Boolean(item.onClick);
       const row = createElement(isClickable ? "button" : "div", {

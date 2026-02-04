@@ -2,10 +2,40 @@ import { matchesText, normalizeTag } from "../utils/strings.js";
 
 // Simple search service for module-level and global search.
 export const createSearchService = () => {
-  let index = { npcs: [], creatures: [], encounters: [], locations: [], items: [], sessions: [] };
+  let index = {
+    global: [],
+    party: [],
+    npcs: [],
+    creatures: [],
+    encounters: [],
+    locations: [],
+    items: [],
+    sessions: [],
+    reviews: [],
+  };
 
   const setIndex = (newIndex) => {
-    index = newIndex || { npcs: [], creatures: [], encounters: [], locations: [], items: [], sessions: [] };
+    index = newIndex || {
+      global: [],
+      party: [],
+      npcs: [],
+      creatures: [],
+      encounters: [],
+      locations: [],
+      items: [],
+      sessions: [],
+      reviews: [],
+    };
+  };
+
+  // Global search only matches names/titles and tags for predictable performance.
+  const searchGlobal = (query) => {
+    if (!query) return [];
+    const normalized = String(query).toLowerCase();
+    return index.global.filter((result) => {
+      const haystack = [result.title, ...(result.tags || [])].join(" ");
+      return matchesText(haystack, normalized);
+    });
   };
 
   const searchNpcs = (query) => {
@@ -31,5 +61,5 @@ export const createSearchService = () => {
     return Array.from(tagSet).filter(Boolean);
   };
 
-  return { setIndex, searchNpcs, suggestTags };
+  return { setIndex, searchGlobal, searchNpcs, suggestTags };
 };

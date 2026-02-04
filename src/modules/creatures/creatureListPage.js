@@ -16,6 +16,16 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
     className: "input",
     attrs: { type: "search", placeholder: "Search creatures and press Enter", "aria-label": "Creature search" },
   });
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
   const tagFilter = createElement("input", {
     className: "input",
     attrs: { type: "text", placeholder: "Filter by tag", "aria-label": "Filter by tag" },
@@ -35,6 +45,7 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "checkbox", "aria-label": "Show archived" },
   });
   const archivedStateBadge = createElement("span", { className: "badge", text: "Showing archived: OFF" });
+  const searchSummary = createElement("p", { className: "text-muted search-summary", text: "" });
 
   let searchQuery = "";
   showArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
@@ -43,6 +54,23 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
     const isOn = showArchivedToggle.checked;
     archivedStateBadge.textContent = `Showing archived: ${isOn ? "ON" : "OFF"}`;
     archivedStateBadge.className = isOn ? "badge warning" : "badge";
+  };
+
+  // Track search, tag, and archived filters for clearer list feedback.
+  const updateSearchSummary = (visibleCount, totalCount) => {
+    const parts = [];
+    if (searchQuery) {
+      parts.push(`search: “${searchQuery}”`);
+    }
+    if (tagFilter.value.trim()) {
+      parts.push(`tag: ${tagFilter.value.trim()}`);
+    }
+    if (showArchivedToggle.checked) {
+      parts.push("including archived");
+    }
+    const filterText = parts.length ? parts.join(" • ") : "no filters";
+    searchSummary.textContent = `Showing ${visibleCount} of ${totalCount} creatures (${filterText}).`;
+    clearButton.disabled = !searchQuery && !tagFilter.value.trim();
   };
 
   const refresh = () => {
@@ -85,15 +113,35 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
         onClick: () => {
           window.location.hash = routes.creatureDetail(campaignId, creature.id);
         },
-      }))
+      })),
+      {
+        emptyState: {
+          title: "No creatures yet",
+          description: "Add a creature to start assembling encounters.",
+          actionLabel: "Create creature",
+          onAction: () => openCreateCreatureModal(),
+        },
+      }
     );
+    updateSearchSummary(filtered.length, creatures.length);
+  };
+
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    refresh();
   };
 
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchQuery = searchInput.value.trim();
-      refresh();
+      applySearch();
     }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    tagFilter.value = "";
+    searchQuery = "";
+    refresh();
   });
   tagFilter.addEventListener("input", refresh);
   sortSelect.addEventListener("change", refresh);
@@ -108,7 +156,7 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "button" },
   });
 
-  newCreatureButton.addEventListener("click", () => {
+  const openCreateCreatureModal = () => {
     const form = createCreatureForm({
       onSubmit: async ({ data, xpUnknown }) => {
         if (!data.name || !data.type || !data.cr) {
@@ -140,13 +188,17 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
       createElement("button", { className: "button", text: "Save", attrs: { type: "submit" } })
     );
     app.modal.open({ title: "Create creature", content: form, actions: [] });
+  };
+
+  newCreatureButton.addEventListener("click", () => {
+    openCreateCreatureModal();
   });
 
   header.append(
     createElement("h1", { text: "Creatures" }),
     createElement("div", {
       className: "form-row inline",
-      children: [searchInput, tagFilter, sortSelect],
+      children: [searchInput, searchButton, clearButton, tagFilter, sortSelect],
     }),
     createElement("div", {
       className: "form-row inline",
@@ -155,6 +207,7 @@ export const renderCreatureListPage = ({ app, campaignId, campaign }) => {
         archivedStateBadge,
       ],
     }),
+    searchSummary,
     newCreatureButton
   );
 
