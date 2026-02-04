@@ -18,6 +18,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - Campaign setting for party size XP split with schema migration support.
 - Items module with list/detail CRUD, passphrase generation, and archive/restore controls.
 - Party module MVP with list/detail CRUD, archive controls, and roster-based XP split support.
+- Session review module MVP with list/detail CRUD, structured change tracking, and references to sessions, encounters, NPCs, and locations.
 
 ### Changed
 - Modal layout now supports sticky header/footer with scrollable body for small viewports.

@@ -31,6 +31,7 @@ import { renderItemDetailPage } from "./modules/items/itemDetailPage.js";
 import { renderSessionListPage } from "./modules/sessions/sessionListPage.js";
 import { renderSessionDetailPage } from "./modules/sessions/sessionDetailPage.js";
 import { renderReviewListPage } from "./modules/reviews/reviewListPage.js";
+import { renderReviewDetailPage } from "./modules/reviews/reviewDetailPage.js";
 import { createElement, clearElement } from "./ui/dom.js";
 
 // Entry point for GM-Toolkit.
@@ -419,6 +420,23 @@ const handleRoute = async (route) => {
     );
     return;
   }
+
+  if (route.type === "review-detail") {
+    if (!campaign.sessionReviews?.[route.reviewId]) {
+      banners.show("Not found: that review no longer exists.", "warning");
+      router.navigate(routes.moduleList(route.campaignId, "reviews"));
+      return;
+    }
+    content.append(
+      renderReviewDetailPage({
+        app,
+        campaignId: route.campaignId,
+        reviewId: route.reviewId,
+        campaign,
+      })
+    );
+    return;
+  }
 };
 
 const renderModuleList = ({ route, campaign }) => {
@@ -438,7 +456,7 @@ const renderModuleList = ({ route, campaign }) => {
     case "sessions":
       return renderSessionListPage({ app, campaignId: route.campaignId, campaign });
     case "reviews":
-      return renderReviewListPage();
+      return renderReviewListPage({ app, campaignId: route.campaignId, campaign });
     default:
       return createElement("div", { className: "card", text: "Module not found." });
   }

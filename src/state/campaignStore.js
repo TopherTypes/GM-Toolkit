@@ -209,6 +209,24 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     await persist();
   };
 
+  // Create a new session review entry for post-session outcomes.
+  const addSessionReview = async (review) => {
+    if (!currentCampaign) return;
+    currentCampaign.sessionReviews[review.id] = review;
+    await persist();
+  };
+
+  // Update an existing session review entry with fresh metadata.
+  const updateSessionReview = async (reviewId, updates) => {
+    if (!currentCampaign?.sessionReviews[reviewId]) return;
+    currentCampaign.sessionReviews[reviewId] = {
+      ...currentCampaign.sessionReviews[reviewId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
   const persist = async () => {
     if (!currentCampaignId || !currentCampaign) return;
     setSaving(true);
@@ -273,6 +291,8 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     updateItem,
     addSession,
     updateSession,
+    addSessionReview,
+    updateSessionReview,
     deleteCampaign,
     persist,
     getCurrentCampaign: () => currentCampaign,
