@@ -24,6 +24,7 @@ import { renderCreatureDetailPage } from "./modules/creatures/creatureDetailPage
 import { renderEncounterListPage } from "./modules/encounters/encounterListPage.js";
 import { renderEncounterDetailPage } from "./modules/encounters/encounterDetailPage.js";
 import { renderLocationListPage } from "./modules/locations/locationListPage.js";
+import { renderLocationDetailPage } from "./modules/locations/locationDetailPage.js";
 import { renderItemListPage } from "./modules/items/itemListPage.js";
 import { renderSessionListPage } from "./modules/sessions/sessionListPage.js";
 import { renderSessionDetailPage } from "./modules/sessions/sessionDetailPage.js";
@@ -349,6 +350,23 @@ const handleRoute = async (route) => {
     return;
   }
 
+  if (route.type === "location-detail") {
+    if (!campaign.locations?.[route.locationId]) {
+      banners.show("Not found: that location no longer exists.", "warning");
+      router.navigate(routes.moduleList(route.campaignId, "locations"));
+      return;
+    }
+    content.append(
+      renderLocationDetailPage({
+        app,
+        campaignId: route.campaignId,
+        locationId: route.locationId,
+        campaign,
+      })
+    );
+    return;
+  }
+
   if (route.type === "session-detail") {
     if (!campaign.sessions?.[route.sessionId]) {
       banners.show("Not found: that session no longer exists.", "warning");
@@ -378,7 +396,7 @@ const renderModuleList = ({ route, campaign }) => {
     case "encounters":
       return renderEncounterListPage({ app, campaignId: route.campaignId, campaign });
     case "locations":
-      return renderLocationListPage();
+      return renderLocationListPage({ app, campaignId: route.campaignId, campaign });
     case "items":
       return renderItemListPage();
     case "sessions":

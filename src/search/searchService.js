@@ -2,10 +2,10 @@ import { matchesText, normalizeTag } from "../utils/strings.js";
 
 // Simple search service for module-level and global search.
 export const createSearchService = () => {
-  let index = { npcs: [], creatures: [], encounters: [], sessions: [] };
+  let index = { npcs: [], creatures: [], encounters: [], locations: [], sessions: [] };
 
   const setIndex = (newIndex) => {
-    index = newIndex || { npcs: [], creatures: [], encounters: [], sessions: [] };
+    index = newIndex || { npcs: [], creatures: [], encounters: [], locations: [], sessions: [] };
   };
 
   const searchNpcs = (query) => {
@@ -22,7 +22,7 @@ export const createSearchService = () => {
     const tagSet = new Set();
     const targets = scopes?.length
       ? scopes
-      : ["npcs", "creatures", "encounters", "sessions"];
+      : ["npcs", "creatures", "encounters", "locations", "sessions"];
     targets.forEach((scope) => {
       (index[scope] || []).forEach((doc) => {
         (doc.tags || []).forEach((tag) => tagSet.add(normalizeTag(tag)));

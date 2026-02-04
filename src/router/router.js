@@ -47,6 +47,10 @@ export const createRouter = ({ onRoute }) => {
       return { type: "encounter-detail", campaignId, encounterId: segments[3], path: "encounters" };
     }
 
+    if (moduleName === "locations" && segments.length === 4) {
+      return { type: "location-detail", campaignId, locationId: segments[3], path: "locations" };
+    }
+
     if (moduleName === "sessions" && segments.length === 4) {
       return { type: "session-detail", campaignId, sessionId: segments[3], path: "sessions" };
     }
