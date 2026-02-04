@@ -139,6 +139,24 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     await persist();
   };
 
+  // Create a new location entry in the active campaign payload.
+  const addLocation = async (location) => {
+    if (!currentCampaign) return;
+    currentCampaign.locations[location.id] = location;
+    await persist();
+  };
+
+  // Update an existing location entry with fresh metadata.
+  const updateLocation = async (locationId, updates) => {
+    if (!currentCampaign?.locations[locationId]) return;
+    currentCampaign.locations[locationId] = {
+      ...currentCampaign.locations[locationId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
   const addSession = async (session) => {
     if (!currentCampaign) return;
     currentCampaign.sessions[session.id] = session;
@@ -211,6 +229,8 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     updateCreature,
     addEncounter,
     updateEncounter,
+    addLocation,
+    updateLocation,
     addSession,
     updateSession,
     deleteCampaign,
