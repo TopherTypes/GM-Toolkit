@@ -42,6 +42,8 @@ Version must be updated in **both** places:
 2) `index.html`
 - include a version comment or meta tag (useful for static hosting visibility)
 
+> **Consistency rule:** the version string in `src/version.js` and the meta/comment in `index.html` must match exactly (including any `-dev` suffix). Treat mismatches as a release-blocking error.
+
 ### UI surfacing (recommended)
 - Show version in:
   - app footer (small)

@@ -29,6 +29,12 @@ export const createTopBar = ({
     },
   });
 
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button", "aria-label": "Open global search" },
+  });
+
   const exportButton = createElement("button", {
     className: "button secondary",
     text: "Export",
@@ -51,6 +57,7 @@ export const createTopBar = ({
     className: "badge",
     text: "Saved",
   });
+  savingIndicator.setAttribute("aria-live", "polite");
 
   campaignSelect.addEventListener("change", (event) => {
     onCampaignChange?.(event.target.value);
@@ -64,6 +71,10 @@ export const createTopBar = ({
     if (event.key === "Enter") {
       onSearch?.(event.target.value);
     }
+  });
+
+  searchButton.addEventListener("click", () => {
+    onSearch?.(searchInput.value);
   });
 
   exportButton.addEventListener("click", () => {
@@ -92,7 +103,15 @@ export const createTopBar = ({
       }),
       createElement("div", {
         className: "app-topbar__right",
-        children: [searchInput, exportButton, importButton, settingsButton],
+        children: [
+          createElement("div", {
+            className: "app-topbar__search",
+            children: [searchInput, searchButton],
+          }),
+          exportButton,
+          importButton,
+          settingsButton,
+        ],
       }),
     ],
   });
@@ -114,9 +133,14 @@ export const createTopBar = ({
       });
       campaignSelect.disabled = campaigns.length === 0;
     },
-    updateSavingIndicator: (status) => {
-      savingIndicator.textContent = status;
-      savingIndicator.className = status === "Saving…" ? "badge warning" : "badge";
+    updateSavingIndicator: ({ isSaving, lastSavedLabel } = {}) => {
+      if (isSaving) {
+        savingIndicator.textContent = "Saving…";
+        savingIndicator.className = "badge warning";
+        return;
+      }
+      savingIndicator.textContent = lastSavedLabel ? `Saved ${lastSavedLabel}` : "Saved";
+      savingIndicator.className = "badge";
     },
     focusSearch: () => {
       searchInput.focus();

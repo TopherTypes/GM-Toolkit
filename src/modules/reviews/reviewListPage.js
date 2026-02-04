@@ -16,11 +16,22 @@ export const renderReviewListPage = ({ app, campaignId, campaign }) => {
     className: "input",
     attrs: { type: "search", placeholder: "Search reviews and press Enter", "aria-label": "Review search" },
   });
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
 
   const showArchivedToggle = createElement("input", {
     attrs: { type: "checkbox", "aria-label": "Show archived" },
   });
   const archivedStateBadge = createElement("span", { className: "badge", text: "Showing archived: OFF" });
+  const searchSummary = createElement("p", { className: "text-muted search-summary", text: "" });
 
   let searchQuery = "";
   showArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
@@ -32,6 +43,20 @@ export const renderReviewListPage = ({ app, campaignId, campaign }) => {
   };
 
   const getSessionLabel = (session) => session?.title || "Untitled session";
+
+  // Summarize active filters to make review visibility clear.
+  const updateSearchSummary = (visibleCount, totalCount) => {
+    const parts = [];
+    if (searchQuery) {
+      parts.push(`search: “${searchQuery}”`);
+    }
+    if (showArchivedToggle.checked) {
+      parts.push("including archived");
+    }
+    const filterText = parts.length ? parts.join(" • ") : "no filters";
+    searchSummary.textContent = `Showing ${visibleCount} of ${totalCount} reviews (${filterText}).`;
+    clearButton.disabled = !searchQuery;
+  };
 
   const refresh = () => {
     const reviews = Object.values(campaign.sessionReviews || {});
@@ -81,15 +106,34 @@ export const renderReviewListPage = ({ app, campaignId, campaign }) => {
             window.location.hash = routes.reviewDetail(campaignId, review.id);
           },
         };
-      })
+      }),
+      {
+        emptyState: {
+          title: "No reviews yet",
+          description: "Capture outcomes after sessions to keep prep aligned.",
+          actionLabel: "Create review",
+          onAction: () => openCreateReviewModal(),
+        },
+      }
     );
+    updateSearchSummary(filtered.length, reviews.length);
+  };
+
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    refresh();
   };
 
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchQuery = searchInput.value.trim();
-      refresh();
+      applySearch();
     }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    searchQuery = "";
+    refresh();
   });
 
   showArchivedToggle.addEventListener("change", () => {
@@ -103,7 +147,7 @@ export const renderReviewListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "button" },
   });
 
-  newReviewButton.addEventListener("click", () => {
+  const openCreateReviewModal = () => {
     const form = createReviewForm({
       sessions: Object.values(campaign.sessions || {}),
       npcs: Object.values(campaign.npcs || {}),
@@ -134,11 +178,18 @@ export const renderReviewListPage = ({ app, campaignId, campaign }) => {
       createElement("button", { className: "button", text: "Save", attrs: { type: "submit" } })
     );
     app.modal.open({ title: "Create review", content: form, actions: [] });
+  };
+
+  newReviewButton.addEventListener("click", () => {
+    openCreateReviewModal();
   });
 
   header.append(
     createElement("h1", { text: "Reviews" }),
-    createElement("div", { className: "form-row inline", children: [searchInput] }),
+    createElement("div", {
+      className: "form-row inline",
+      children: [searchInput, searchButton, clearButton],
+    }),
     createElement("div", {
       className: "form-row inline",
       children: [
@@ -146,6 +197,7 @@ export const renderReviewListPage = ({ app, campaignId, campaign }) => {
         archivedStateBadge,
       ],
     }),
+    searchSummary,
     newReviewButton
   );
 

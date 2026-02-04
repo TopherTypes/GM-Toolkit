@@ -15,6 +15,17 @@ export const renderSessionListPage = ({ app, campaignId, campaign }) => {
     className: "input",
     attrs: { type: "search", placeholder: "Search sessions and press Enter", "aria-label": "Session search" },
   });
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
+  const searchSummary = createElement("p", { className: "text-muted search-summary", text: "" });
 
   let searchQuery = "";
 
@@ -37,15 +48,35 @@ export const renderSessionListPage = ({ app, campaignId, campaign }) => {
         onClick: () => {
           window.location.hash = routes.sessionDetail(campaignId, session.id);
         },
-      }))
+      })),
+      {
+        emptyState: {
+          title: "No sessions yet",
+          description: "Create a session to start linking encounters and notes.",
+          actionLabel: "Create session",
+          onAction: () => openCreateSessionModal(),
+        },
+      }
     );
+    searchSummary.textContent = `Showing ${filtered.length} of ${sessions.length} sessions${searchQuery ? ` for “${searchQuery}”` : ""}.`;
+    clearButton.disabled = !searchQuery;
+  };
+
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    refresh();
   };
 
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchQuery = searchInput.value.trim();
-      refresh();
+      applySearch();
     }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    searchQuery = "";
+    refresh();
   });
 
   const newSessionButton = createElement("button", {
@@ -54,7 +85,7 @@ export const renderSessionListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "button" },
   });
 
-  newSessionButton.addEventListener("click", () => {
+  const openCreateSessionModal = () => {
     const titleInput = createElement("input", {
       className: "input",
       attrs: { type: "text", required: true, "aria-label": "Session title" },
@@ -99,11 +130,16 @@ export const renderSessionListPage = ({ app, campaignId, campaign }) => {
     });
 
     app.modal.open({ title: "Create session", content: form, actions: [] });
+  };
+
+  newSessionButton.addEventListener("click", () => {
+    openCreateSessionModal();
   });
 
   header.append(
     createElement("h1", { text: "Sessions" }),
-    createElement("div", { className: "form-row inline", children: [searchInput] }),
+    createElement("div", { className: "form-row inline", children: [searchInput, searchButton, clearButton] }),
+    searchSummary,
     newSessionButton
   );
 

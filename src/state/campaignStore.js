@@ -8,10 +8,14 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
   let currentCampaignId = null;
   let currentCampaign = null;
   let isSaving = false;
+  // Track the last successful persistence time for UI feedback.
+  let lastSavedAt = null;
   const listeners = new Set();
 
   const notify = () => {
-    listeners.forEach((listener) => listener({ currentCampaignId, currentCampaign, isSaving }));
+    listeners.forEach((listener) =>
+      listener({ currentCampaignId, currentCampaign, isSaving, lastSavedAt })
+    );
   };
 
   const subscribe = (listener) => {
@@ -75,6 +79,7 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     }
     currentCampaignId = campaignId;
     currentCampaign = stored.payload;
+    lastSavedAt = currentCampaign?.campaign?.updatedAt || null;
     setSaving(false);
     const index = storageService.loadIndex();
     index.lastOpenedCampaignId = campaignId;
@@ -245,6 +250,7 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     } else if (usage.percent >= 70) {
       banners?.show("Storage is getting full. Export a backup soon.", "warning");
     }
+    lastSavedAt = nowIso();
     setSaving(false);
   };
 
@@ -298,6 +304,7 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     getCurrentCampaign: () => currentCampaign,
     getCurrentCampaignId: () => currentCampaignId,
     isSaving: () => isSaving,
+    getLastSavedAt: () => lastSavedAt,
     createEmptyPayload,
   };
 };

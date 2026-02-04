@@ -16,6 +16,16 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
     className: "input",
     attrs: { type: "search", placeholder: "Search party members and press Enter", "aria-label": "Party search" },
   });
+  const searchButton = createElement("button", {
+    className: "button secondary",
+    text: "Search",
+    attrs: { type: "button" },
+  });
+  const clearButton = createElement("button", {
+    className: "button secondary",
+    text: "Clear",
+    attrs: { type: "button" },
+  });
   const sortSelect = createElement("select", {
     className: "select",
     attrs: { "aria-label": "Sort party members" },
@@ -32,6 +42,7 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "checkbox", "aria-label": "Show archived" },
   });
   const archivedStateBadge = createElement("span", { className: "badge", text: "Showing archived: OFF" });
+  const searchSummary = createElement("p", { className: "text-muted search-summary", text: "" });
 
   let searchQuery = "";
   showArchivedToggle.checked = Boolean(app.settings?.get?.().showArchivedByDefault);
@@ -41,6 +52,20 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
     const isOn = showArchivedToggle.checked;
     archivedStateBadge.textContent = `Showing archived: ${isOn ? "ON" : "OFF"}`;
     archivedStateBadge.className = isOn ? "badge warning" : "badge";
+  };
+
+  // Keep users informed about active search/filter context.
+  const updateSearchSummary = (visibleCount, totalCount) => {
+    const parts = [];
+    if (searchQuery) {
+      parts.push(`search: “${searchQuery}”`);
+    }
+    if (showArchivedToggle.checked) {
+      parts.push("including archived");
+    }
+    const filterText = parts.length ? parts.join(" • ") : "no filters";
+    searchSummary.textContent = `Showing ${visibleCount} of ${totalCount} party members (${filterText}).`;
+    clearButton.disabled = !searchQuery;
   };
 
   const refresh = () => {
@@ -90,16 +115,34 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
             window.location.hash = routes.partyDetail(campaignId, member.id);
           },
         };
-      })
+      }),
+      {
+        emptyState: {
+          title: "No party members yet",
+          description: "Add the party to keep XP splits and session prep in sync.",
+          actionLabel: "Add party member",
+          onAction: () => openCreatePartyModal(),
+        },
+      }
     );
+    updateSearchSummary(filtered.length, members.length);
   };
 
   // Apply search only when Enter is pressed to match module convention.
+  const applySearch = () => {
+    searchQuery = searchInput.value.trim();
+    refresh();
+  };
   searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchQuery = searchInput.value.trim();
-      refresh();
+      applySearch();
     }
+  });
+  searchButton.addEventListener("click", applySearch);
+  clearButton.addEventListener("click", () => {
+    searchInput.value = "";
+    searchQuery = "";
+    refresh();
   });
   sortSelect.addEventListener("change", refresh);
   showArchivedToggle.addEventListener("change", () => {
@@ -113,7 +156,7 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
     attrs: { type: "button" },
   });
 
-  newPartyMemberButton.addEventListener("click", () => {
+  const openCreatePartyModal = () => {
     const form = createPartyForm({
       onSubmit: async (data) => {
         if (!data.playerName) {
@@ -144,13 +187,17 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
       createElement("button", { className: "button", text: "Save", attrs: { type: "submit" } })
     );
     app.modal.open({ title: "Add party member", content: form, actions: [] });
+  };
+
+  newPartyMemberButton.addEventListener("click", () => {
+    openCreatePartyModal();
   });
 
   header.append(
     createElement("h1", { text: "Party" }),
     createElement("div", {
       className: "form-row inline",
-      children: [searchInput, sortSelect],
+      children: [searchInput, searchButton, clearButton, sortSelect],
     }),
     createElement("div", {
       className: "form-row inline",
@@ -159,6 +206,7 @@ export const renderPartyListPage = ({ app, campaignId, campaign }) => {
         archivedStateBadge,
       ],
     }),
+    searchSummary,
     newPartyMemberButton
   );
 

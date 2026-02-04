@@ -19,17 +19,23 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - Items module with list/detail CRUD, passphrase generation, and archive/restore controls.
 - Party module MVP with list/detail CRUD, archive controls, and roster-based XP split support.
 - Session review module MVP with list/detail CRUD, structured change tracking, and references to sessions, encounters, NPCs, and locations.
+- Global search across all entity types with type badges, metadata, and archived toggle support.
+- List empty states and clear search controls across modules.
+- Global search keyboard shortcut (Ctrl/Cmd+K) and top-bar search button.
 
 ### Changed
 - Modal layout now supports sticky header/footer with scrollable body for small viewports.
 - NPC list rows include hover and focus affordances with archived markers.
 - Search index now includes creatures, encounters, and sessions for tag suggestions.
+- Top bar saving indicator now includes the last saved time.
+- List pages now surface filter summaries for transparency.
 
 ### Fixed
 - Fix GitHub Pages asset paths (relative paths for project site).
 - Fix campaignStore SyntaxError (remove invalid token / encoding issue).
 - Prevent NPC key skills from overflowing modals and ensure removals persist.
 - Clarify completion labels, keep WIP controls prominent, and add safe preview modals to prevent losing unsaved encounter/session changes.
+- Align app version metadata across source and HTML.
 
 ### Removed
 

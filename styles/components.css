@@ -21,6 +21,13 @@
   flex-wrap: wrap;
 }
 
+.app-topbar__search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .app-logo {
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -96,6 +103,10 @@
 
 .text-muted {
   color: var(--color-text-muted);
+}
+
+.search-summary {
+  font-size: 0.9rem;
 }
 
 .stack {
@@ -279,6 +290,20 @@
 
 .list-item--archived .list-item__title {
   text-decoration: line-through;
+}
+
+.empty-state {
+  border: 1px dashed var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background: var(--color-surface-alt);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.empty-state__actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .list-item__meta {

@@ -20,14 +20,14 @@
 - **Schema versioning + migrations** — finished
 - **Export/import with dry run + conflict resolution** — finished
 - **JSON backups with backwards compatibility** — finished
-- **Storage size warning** — MVP
+- **Storage size warning** — finished
 - **Backlinks (computed on the fly)** — MVP
 
 ## Global conventions (docs-driven)
 - **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Locations/Items/Sessions/Party/Reviews implemented; Locations still pending)
 - **References panel on all detail pages** — in development (present, but limited linking coverage)
-- **Global search across all entities** — in development (currently NPC-only)
-- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for Party/NPCs/Creatures/Encounters/Items/Locations/Sessions/Reviews)
+- **Global search across all entities** — finished (type-aware results + metadata)
+- **Per-module search (Enter to search name/tags/notes)** — finished (with clear controls and filter summaries)
 - **Tagging across modules** — in development (NPCs/Creatures/Encounters/Items/Locations/Sessions)
 
 ## Module coverage
@@ -106,7 +106,7 @@
 - **Session prep wizard improvements (validation, ordering, quick-create flows)** — todo
 - **Better creature stat blocks + templates** — todo
 - **Encounter templates/reusable groups** — todo
-- **Search/tagging expansion beyond NPCs/Creatures** — todo
+- **Global search preview and richer metadata** — todo
 - **Print/PDF polish (layout consistency, overflow handling)** — todo
 - **Performance improvements for large campaigns** — todo
 - **Accessibility pass (keyboard-first + focus clarity)** — todo
