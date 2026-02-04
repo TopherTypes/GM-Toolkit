@@ -16,6 +16,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - Full Creatures and Encounters modules with CRUD, quick-create pickers, XP calculations, and backlinks.
 - Session prep module with ordered encounter references and inline summaries.
 - Campaign setting for party size XP split with schema migration support.
+- Items module with list/detail CRUD, passphrase generation, and archive/restore controls.
 
 ### Changed
 - Modal layout now supports sticky header/footer with scrollable body for small viewports.

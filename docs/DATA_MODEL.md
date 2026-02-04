@@ -199,6 +199,18 @@ Fields:
 - `tags[]`
 - `createdAt`, `updatedAt`
 
+### Item
+Fields:
+- `id`
+- `campaignId`
+- `name`
+- `description` (unidentified)
+- `details` (identified)
+- `passphrase` (shared across both card variants)
+- `notes` (optional)
+- `tags[]` (optional)
+- `createdAt`, `updatedAt`
+
 ### Creature
 Fields:
 - `id`

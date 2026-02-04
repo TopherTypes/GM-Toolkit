@@ -41,9 +41,9 @@ Focus: Deliver the minimum viable product workflows for party management, locati
 - [ ] Location create, read, update, delete, and archive with parent and child hierarchy.
 - [ ] Location description and tags.
 - [ ] Session and location linking.
-- [ ] Item create, read, update, delete, and archive.
-- [ ] Item fields: name, description, identified details, passphrase, notes, and tags.
-- [ ] Passphrase generation for items.
+- [x] Item create, read, update, delete, and archive.
+- [x] Item fields: name, description, identified details, passphrase, notes, and tags.
+- [x] Passphrase generation for items.
 - [ ] Trading card game style print variants for items.
 
 ## Version 0.8.1 — Session preparation and print slice
@@ -67,7 +67,7 @@ Focus: Close remaining minimum viable product gaps and complete global conventio
 
 - [ ] Storage size warning.
 - [ ] Backlinks computed on the fly.
-- [ ] Create, read, update, delete, and archive support for party, locations, items, and reviews.
+- [/] Create, read, update, delete, and archive support for party, locations, items, and reviews.
 - [ ] References panel coverage expanded across all modules.
 - [ ] Global search across all entities beyond nonplayer characters.
 - [ ] Per-module search for remaining modules.

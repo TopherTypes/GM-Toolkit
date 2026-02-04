@@ -3,7 +3,7 @@ import { normalizeTag } from "../utils/strings.js";
 // Build a basic search index for the current campaign.
 export const buildIndex = (campaign) => {
   if (!campaign) {
-    return { npcs: [], creatures: [], encounters: [], locations: [], sessions: [] };
+    return { npcs: [], creatures: [], encounters: [], locations: [], items: [], sessions: [] };
   }
 
   const npcDocs = Object.values(campaign.npcs || {}).map((npc) => ({
@@ -38,6 +38,16 @@ export const buildIndex = (campaign) => {
     isArchived: location.isArchived || false,
   }));
 
+  const itemDocs = Object.values(campaign.items || {}).map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description || "",
+    details: item.details || "",
+    passphrase: item.passphrase || "",
+    tags: (item.tags || []).map(normalizeTag),
+    isArchived: item.isArchived || false,
+  }));
+
   const sessionDocs = Object.values(campaign.sessions || {}).map((session) => ({
     id: session.id,
     title: session.title,
@@ -49,6 +59,7 @@ export const buildIndex = (campaign) => {
     creatures: creatureDocs,
     encounters: encounterDocs,
     locations: locationDocs,
+    items: itemDocs,
     sessions: sessionDocs,
   };
 };
