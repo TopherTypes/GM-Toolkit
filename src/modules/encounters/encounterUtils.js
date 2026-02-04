@@ -1,5 +1,14 @@
 import { getXpForCr } from "../../utils/xp.js";
 
+// Prefer active party roster size when available, falling back to the campaign setting.
+const resolvePartySize = (campaign) => {
+  const members = Object.values(campaign?.party || {}).filter((member) => !member.isArchived);
+  if (members.length) {
+    return members.length;
+  }
+  return Math.max(1, Number(campaign?.campaign?.partySizeForXpSplit || 4));
+};
+
 // Calculate total and per-member XP for an encounter.
 export const calculateEncounterXp = ({ encounter, campaign }) => {
   const participants = encounter?.participants || [];
@@ -23,7 +32,7 @@ export const calculateEncounterXp = ({ encounter, campaign }) => {
     }
   });
 
-  const partySize = Math.max(1, Number(campaign?.campaign?.partySizeForXpSplit || 4));
+  const partySize = resolvePartySize(campaign);
   const xpPerMember = Math.floor(totalXp / partySize);
 
   return { totalXp, xpPerMember, warnings, partySize };

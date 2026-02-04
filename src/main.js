@@ -19,6 +19,7 @@ import { renderDashboardPage } from "./modules/dashboard/dashboardPage.js";
 import { renderNpcListPage } from "./modules/npcs/npcListPage.js";
 import { renderNpcDetailPage } from "./modules/npcs/npcDetailPage.js";
 import { renderPartyListPage } from "./modules/party/partyListPage.js";
+import { renderPartyDetailPage } from "./modules/party/partyDetailPage.js";
 import { renderCreatureListPage } from "./modules/creatures/creatureListPage.js";
 import { renderCreatureDetailPage } from "./modules/creatures/creatureDetailPage.js";
 import { renderEncounterListPage } from "./modules/encounters/encounterListPage.js";
@@ -307,6 +308,23 @@ const handleRoute = async (route) => {
     return;
   }
 
+  if (route.type === "party-detail") {
+    if (!campaign.party?.[route.memberId]) {
+      banners.show("Not found: that party member no longer exists.", "warning");
+      router.navigate(routes.moduleList(route.campaignId, "party"));
+      return;
+    }
+    content.append(
+      renderPartyDetailPage({
+        app,
+        campaignId: route.campaignId,
+        memberId: route.memberId,
+        campaign,
+      })
+    );
+    return;
+  }
+
   if (route.type === "npc-detail") {
     if (!campaign.npcs?.[route.npcId]) {
       banners.show("Not found: that NPC no longer exists.", "warning");
@@ -406,7 +424,7 @@ const handleRoute = async (route) => {
 const renderModuleList = ({ route, campaign }) => {
   switch (route.module) {
     case "party":
-      return renderPartyListPage();
+      return renderPartyListPage({ app, campaignId: route.campaignId, campaign });
     case "npcs":
       return renderNpcListPage({ app, campaignId: route.campaignId, campaign });
     case "creatures":

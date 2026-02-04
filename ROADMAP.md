@@ -36,8 +36,8 @@ Focus: Deliver the minimum viable product workflows for party management, locati
 - [ ] Campaign dashboard prep checklist and next-session summary.
 - [ ] Campaign dashboard recently edited list and tool quick links.
 - [ ] Campaign dashboard session pack print entry point.
-- [ ] Party roster with player and character fields.
-- [ ] Experience point split support sourced from party data.
+- [x] Party roster with player and character fields.
+- [x] Experience point split support sourced from party data.
 - [ ] Location create, read, update, delete, and archive with parent and child hierarchy.
 - [ ] Location description and tags.
 - [ ] Session and location linking.
@@ -67,7 +67,7 @@ Focus: Close remaining minimum viable product gaps and complete global conventio
 
 - [ ] Storage size warning.
 - [ ] Backlinks computed on the fly.
-- [/] Create, read, update, delete, and archive support for party, locations, items, and reviews.
+- [/] Create, read, update, delete, and archive support for party, locations, items, and reviews (party and items complete).
 - [ ] References panel coverage expanded across all modules.
 - [ ] Global search across all entities beyond nonplayer characters.
 - [ ] Per-module search for remaining modules.

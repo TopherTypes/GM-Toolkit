@@ -3,6 +3,7 @@ export const routes = {
   root: () => "#/",
   dashboard: (campaignId) => `#/c/${campaignId}`,
   moduleList: (campaignId, module) => `#/c/${campaignId}/${module}`,
+  partyDetail: (campaignId, memberId) => `#/c/${campaignId}/party/${memberId}`,
   npcDetail: (campaignId, npcId) => `#/c/${campaignId}/npcs/${npcId}`,
   creatureDetail: (campaignId, creatureId) => `#/c/${campaignId}/creatures/${creatureId}`,
   encounterDetail: (campaignId, encounterId) => `#/c/${campaignId}/encounters/${encounterId}`,

@@ -24,10 +24,10 @@
 - **Backlinks (computed on the fly)** — MVP
 
 ## Global conventions (docs-driven)
-- **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Locations/Items/Sessions implemented; Party/Reviews pending)
+- **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Locations/Items/Sessions/Party implemented; Reviews pending)
 - **References panel on all detail pages** — in development (present, but limited linking coverage)
 - **Global search across all entities** — in development (currently NPC-only)
-- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for NPCs/Creatures/Encounters/Items/Locations/Sessions)
+- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for Party/NPCs/Creatures/Encounters/Items/Locations/Sessions)
 - **Tagging across modules** — in development (NPCs/Creatures/Encounters/Items/Locations/Sessions)
 
 ## Module coverage
@@ -41,8 +41,8 @@
 - **Session pack print entry point** — MVP
 
 ### Party
-- **Party roster + player/character fields** — MVP
-- **XP split support from party data** — MVP
+- **Party roster + player/character fields** — finished
+- **XP split support from party data** — finished
 
 ### NPCs
 - **NPC CRUD + archive/restore** — finished

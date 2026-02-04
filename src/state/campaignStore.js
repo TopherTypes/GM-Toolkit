@@ -101,6 +101,24 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     await persist();
   };
 
+  // Create a new party member entry in the active campaign payload.
+  const addPartyMember = async (member) => {
+    if (!currentCampaign) return;
+    currentCampaign.party[member.id] = member;
+    await persist();
+  };
+
+  // Update an existing party member entry with fresh metadata.
+  const updatePartyMember = async (memberId, updates) => {
+    if (!currentCampaign?.party[memberId]) return;
+    currentCampaign.party[memberId] = {
+      ...currentCampaign.party[memberId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
   const updateNpc = async (npcId, updates) => {
     if (!currentCampaign?.npcs[npcId]) return;
     currentCampaign.npcs[npcId] = { ...currentCampaign.npcs[npcId], ...updates, updatedAt: nowIso() };
@@ -241,6 +259,8 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     createCampaign,
     loadCampaign,
     updateCampaignMeta,
+    addPartyMember,
+    updatePartyMember,
     addNpc,
     updateNpc,
     addCreature,
