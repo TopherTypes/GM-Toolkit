@@ -63,6 +63,10 @@ export const createRouter = ({ onRoute }) => {
       return { type: "session-detail", campaignId, sessionId: segments[3], path: "sessions" };
     }
 
+    if (moduleName === "reviews" && segments.length === 4) {
+      return { type: "review-detail", campaignId, reviewId: segments[3], path: "reviews" };
+    }
+
     return { type: "not-found", campaignId, path: moduleName };
   };
 

@@ -67,13 +67,13 @@ Focus: Close remaining minimum viable product gaps and complete global conventio
 
 - [ ] Storage size warning.
 - [ ] Backlinks computed on the fly.
-- [/] Create, read, update, delete, and archive support for party, locations, items, and reviews (party and items complete).
+- [/] Create, read, update, delete, and archive support for party, locations, items, and reviews (party, items, and reviews complete).
 - [ ] References panel coverage expanded across all modules.
 - [ ] Global search across all entities beyond nonplayer characters.
 - [ ] Per-module search for remaining modules.
 - [ ] Tagging across all remaining modules.
-- [ ] Review module with fields for summary, key moments, outcomes, rewards, information changes, hooks, and game master notes.
-- [ ] Review linking to sessions, nonplayer characters, and locations.
+- [x] Review module with fields for summary, key moments, outcomes, rewards, information changes, hooks, and game master notes.
+- [/] Review linking to sessions, nonplayer characters, and locations.
 - [x] Minimum viable product milestone achieved.
 
 ## Version 0.10.0 — Post-minimum viable product enhancements

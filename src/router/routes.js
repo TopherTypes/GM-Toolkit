@@ -10,6 +10,7 @@ export const routes = {
   locationDetail: (campaignId, locationId) => `#/c/${campaignId}/locations/${locationId}`,
   itemDetail: (campaignId, itemId) => `#/c/${campaignId}/items/${itemId}`,
   sessionDetail: (campaignId, sessionId) => `#/c/${campaignId}/sessions/${sessionId}`,
+  reviewDetail: (campaignId, reviewId) => `#/c/${campaignId}/reviews/${reviewId}`,
 };
 
 export const moduleListRoutes = [

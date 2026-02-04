@@ -43,6 +43,7 @@ Core outcomes:
 - LocalStorage persistence
 - JSON export/import with dry run, conflicts, and schema migration confirmation
 - Party roster management with archive controls and XP split integration
+- Session Review module MVP workflow (list/detail + structured change capture)
 
 Modules at MVP depth:
 - Campaign Dashboard

@@ -24,10 +24,10 @@
 - **Backlinks (computed on the fly)** — MVP
 
 ## Global conventions (docs-driven)
-- **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Locations/Items/Sessions/Party implemented; Reviews pending)
+- **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Locations/Items/Sessions/Party/Reviews implemented; Locations still pending)
 - **References panel on all detail pages** — in development (present, but limited linking coverage)
 - **Global search across all entities** — in development (currently NPC-only)
-- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for Party/NPCs/Creatures/Encounters/Items/Locations/Sessions)
+- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for Party/NPCs/Creatures/Encounters/Items/Locations/Sessions/Reviews)
 - **Tagging across modules** — in development (NPCs/Creatures/Encounters/Items/Locations/Sessions)
 
 ## Module coverage
@@ -90,9 +90,9 @@
 - **Session pack generation** — MVP
 
 ### Reviews (Session Review)
-- **Review CRUD + archive/restore** — MVP
-- **Review fields (summary, key moments, outcomes, rewards, info changes, hooks, GM notes)** — MVP
-- **Session/NPC/Location linking** — MVP
+- **Review CRUD + archive/restore** — finished
+- **Review fields (summary, key moments, outcomes, rewards, info changes, hooks, GM notes)** — finished
+- **Session/NPC/Location linking** — in development (session linking + structured change references implemented)
 
 ## Printing & PDF
 - **PDF library fallback + smoke test** — finished
