@@ -157,6 +157,24 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     await persist();
   };
 
+  // Create a new item entry in the active campaign payload.
+  const addItem = async (item) => {
+    if (!currentCampaign) return;
+    currentCampaign.items[item.id] = item;
+    await persist();
+  };
+
+  // Update an existing item entry with fresh metadata.
+  const updateItem = async (itemId, updates) => {
+    if (!currentCampaign?.items[itemId]) return;
+    currentCampaign.items[itemId] = {
+      ...currentCampaign.items[itemId],
+      ...updates,
+      updatedAt: nowIso(),
+    };
+    await persist();
+  };
+
   const addSession = async (session) => {
     if (!currentCampaign) return;
     currentCampaign.sessions[session.id] = session;
@@ -231,6 +249,8 @@ export const createCampaignStore = ({ storageService, toasts, banners }) => {
     updateEncounter,
     addLocation,
     updateLocation,
+    addItem,
+    updateItem,
     addSession,
     updateSession,
     deleteCampaign,

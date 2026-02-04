@@ -24,11 +24,11 @@
 - **Backlinks (computed on the fly)** — MVP
 
 ## Global conventions (docs-driven)
-- **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Sessions implemented; Party/Locations/Items/Reviews pending)
+- **CRUD + archive across all modules** — in development (NPCs/Creatures/Encounters/Locations/Items/Sessions implemented; Party/Reviews pending)
 - **References panel on all detail pages** — in development (present, but limited linking coverage)
 - **Global search across all entities** — in development (currently NPC-only)
-- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for NPCs/Creatures/Encounters/Sessions)
-- **Tagging across modules** — in development (NPCs/Creatures/Encounters/Sessions)
+- **Per-module search (Enter to search name/tags/notes)** — in development (implemented for NPCs/Creatures/Encounters/Items/Locations/Sessions)
+- **Tagging across modules** — in development (NPCs/Creatures/Encounters/Items/Locations/Sessions)
 
 ## Module coverage
 
@@ -75,9 +75,9 @@
 - **Session/location linking** — MVP
 
 ### Items
-- **Item CRUD + archive/restore** — MVP
-- **Item fields (name, description, identified details, passphrase, notes, tags)** — MVP
-- **Passphrase generation** — MVP
+- **Item CRUD + archive/restore** — finished
+- **Item fields (name, description, identified details, passphrase, notes, tags)** — finished
+- **Passphrase generation** — finished
 - **TCG card print variants** — MVP
 
 ### Sessions (Session Prep)

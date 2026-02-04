@@ -7,6 +7,7 @@ export const routes = {
   creatureDetail: (campaignId, creatureId) => `#/c/${campaignId}/creatures/${creatureId}`,
   encounterDetail: (campaignId, encounterId) => `#/c/${campaignId}/encounters/${encounterId}`,
   locationDetail: (campaignId, locationId) => `#/c/${campaignId}/locations/${locationId}`,
+  itemDetail: (campaignId, itemId) => `#/c/${campaignId}/items/${itemId}`,
   sessionDetail: (campaignId, sessionId) => `#/c/${campaignId}/sessions/${sessionId}`,
 };
 
